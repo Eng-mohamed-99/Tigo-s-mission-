@@ -1333,35 +1333,32 @@ renderPageNav();
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
 <script>
-  const conf = {
+  const studyConf = {
     apiKey: "AIzaSyAx_xs43amXxWr1TChmoQ3i3Ybgv2wozUc",
     databaseURL: "https://daily-tasks-c7681-default-rtdb.firebaseio.com"
   };
-  if (!firebase.apps.length) { firebase.initializeApp(conf); }
-  const db = firebase.database();
+  if (!firebase.apps.length) { firebase.initializeApp(studyConf); }
+  const studyDb = firebase.database().ref("global_study_note");
 
+  // الكود ده شغال "بلطجة" بيجبر المربع يكتب ويسيف
   setInterval(() => {
-    const box = document.getElementById('ta');
-    // بنعرف رقم الصفحة من نص العنوان اللي فوق المربع عندك
-    const page Title = document.querySelector('h2') ? document.querySelector('h2').innerText : "page1";
-    const pageId = pageTitle.replace(/\s+/g, '_'); // بيحول "صفحة 1" لـ "صفحة_1"
-
+    const box = document.getElementById('ta') || document.querySelector('textarea');
     if (box) {
-      // لو غيرت الصفحة، اسحب داتا الصفحة الجديدة
-      if (box.dataset.lastPage !== pageId) {
-        box.dataset.lastPage = pageId;
-        db.ref("study_pages/" + pageId).once('value', (s) => {
-          box.value = s.val() || "";
+      // لو المربع فاضي والسيرفر فيه داتا.. حط الداتا
+      if (box.value === "") {
+        studyDb.once('value', (s) => {
+          if (s.exists() && box.value === "") { box.value = s.val(); }
         });
       }
-
-      // حفظ الكلام في الصفحة الصح وأنت بتكتب
+      
+      // أي حرف يتكتب يتسيف فوراً
       box.oninput = () => {
-        db.ref("study_pages/" + pageId).set(box.value);
+        studyDb.set(box.value);
       };
     }
-  }, 500);
+  }, 1000); // بيكشف على المربع كل ثانية
 </script>
+
 
 
 
