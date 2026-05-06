@@ -1,0 +1,1332 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+<title>كشكول تيغو — اكتب وسجّل</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&family=Amiri:wght@400;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{--cover:#1e3a5f;--paper:#fdf8f0;--ink:#1a3a6e;--bg:#0d1117;--gold:#f5c842;--muted:#6b7a99;--red:#ef4444;--green:#10b981;--blue:#3b82f6;--border:#ffffff12;}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{min-height:100vh;background:var(--bg);color:#dde3f0;font-family:'Tajawal',sans-serif;direction:rtl}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:#ffffff20;border-radius:3px}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.15}}
+@keyframes wave{0%,100%{height:6px}50%{height:26px}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.fu{animation:fadeUp .32s ease both}
+
+/* TOP BAR */
+#bar{position:sticky;top:0;z-index:200;background:#0d1117ee;backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:10px 15px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:9px}
+.li{width:33px;height:33px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;transition:background .4s}
+.ln{font-family:'Amiri',serif;font-size:16px;color:var(--gold)}
+.ls{font-size:10px;color:var(--muted);display:block}
+.tbs{display:flex;gap:6px;flex-wrap:wrap}
+.tb{padding:6px 11px;border-radius:8px;border:1px solid;cursor:pointer;font-size:12px;font-family:'Tajawal',sans-serif;font-weight:600;background:transparent;transition:all .2s;white-space:nowrap}
+
+/* OVERLAYS */
+.ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:300;align-items:center;justify-content:center}
+.ov.open{display:flex}
+.panel{background:#1a1f30;border:1px solid var(--border);border-radius:20px;padding:22px 18px;width:min(580px,97vw);max-height:92vh;overflow-y:auto}
+.panel h3{font-family:'Amiri',serif;color:var(--gold);font-size:18px;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center}
+.panel-sub{font-size:12px;color:var(--muted);margin-bottom:12px}
+.cx{background:transparent;border:none;color:var(--muted);font-size:18px;cursor:pointer}
+
+/* SETTINGS */
+.ss{margin-bottom:13px}
+.sl{font-size:10px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;font-weight:700;margin-bottom:7px}
+.sr{display:flex;gap:6px;flex-wrap:wrap}
+.so{padding:7px 12px;border-radius:8px;border:2px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-family:'Tajawal',sans-serif;font-size:13px;transition:all .2s}
+.so.on{border-color:var(--gold);background:rgba(245,200,66,.12);color:var(--gold);font-weight:700}
+.cd{width:30px;height:30px;border-radius:7px;cursor:pointer;border:3px solid transparent;transition:all .2s;box-shadow:0 2px 5px rgba(0,0,0,.4)}
+.cd.on{border-color:var(--gold)!important;transform:scale(1.12)}
+
+/* SYMBOL PANEL */
+.sym-cats{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px}
+.sym-cat{padding:5px 10px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:11px;font-family:'Tajawal',sans-serif;transition:all .2s;white-space:nowrap}
+.sym-cat.on{background:rgba(245,200,66,.12);border-color:var(--gold);color:var(--gold);font-weight:700}
+.sym-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:4px}
+.sym-row{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.03);border-radius:7px;padding:6px 9px;cursor:pointer;transition:background .15s;border:1px solid transparent}
+.sym-row:hover{background:rgba(245,200,66,.07);border-color:rgba(245,200,66,.15)}
+.sym-s{font-family:'JetBrains Mono',monospace;color:var(--gold);font-size:13px;min-width:32px;text-align:center;flex-shrink:0;background:rgba(245,200,66,.08);padding:2px 5px;border-radius:5px}
+.sym-info{flex:1;min-width:0}
+.sym-label{color:#dde3f0;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sym-words{color:var(--muted);font-size:10px;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#sym-search{width:100%;padding:9px 13px;background:#0d1117;border:1px solid var(--border);border-radius:9px;color:#dde3f0;font-family:'Tajawal',sans-serif;font-size:13px;outline:none;margin-bottom:10px;direction:rtl}
+#sym-search:focus{border-color:rgba(245,200,66,.4)}
+.sym-count{font-size:11px;color:var(--muted);text-align:left;margin-bottom:8px}
+
+/* FLASH */
+#flash{position:fixed;top:66px;left:50%;transform:translateX(-50%);background:#0f2a1a;border:1px solid var(--green);color:#6ee7b7;padding:7px 18px;border-radius:9px;font-size:13px;font-weight:600;z-index:500;display:none;white-space:nowrap;font-family:'JetBrains Mono',monospace}
+
+/* APP */
+#app{max-width:760px;margin:0 auto;padding:16px 13px 70px}
+
+/* VOICE */
+#vb{background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.22);border-radius:12px;padding:11px 14px;margin-bottom:11px;display:none;align-items:center;gap:10px;flex-wrap:wrap}
+#vb.on{display:flex}
+.rd{width:10px;height:10px;background:var(--red);border-radius:50%;animation:blink .9s infinite;flex-shrink:0}
+.ws{display:flex;gap:3px;align-items:center;height:24px}
+.wv{width:3px;background:var(--red);border-radius:2px;animation:wave 1s ease-in-out infinite;opacity:.75}
+.wv:nth-child(2){animation-delay:.15s}.wv:nth-child(3){animation-delay:.3s}.wv:nth-child(4){animation-delay:.45s}.wv:nth-child(5){animation-delay:.6s}
+.rt{font-family:'JetBrains Mono',monospace;color:var(--red);font-size:15px}
+.rl{font-size:12px;color:var(--muted);flex:1}
+.sbt{padding:6px 12px;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:#f87171;border-radius:7px;cursor:pointer;font-family:'Tajawal',sans-serif;font-size:12px;font-weight:700}
+
+.rrow{display:flex;gap:7px;margin-bottom:11px;align-items:center;flex-wrap:wrap}
+.lsel{padding:9px 11px;background:#0d1117;border:1px solid var(--border);border-radius:9px;color:#dde3f0;font-family:'Tajawal',sans-serif;font-size:13px;cursor:pointer;outline:none;flex:1;min-width:120px}
+.rbtn{padding:9px 15px;border-radius:9px;border:1px solid rgba(239,68,68,.35);background:rgba(239,68,68,.12);color:#f87171;cursor:pointer;font-family:'Tajawal',sans-serif;font-size:13px;font-weight:700;display:flex;align-items:center;gap:6px;transition:all .2s;white-space:nowrap}
+.rbtn:hover{background:rgba(239,68,68,.22)}
+.rbtn svg{width:14px;height:14px;fill:currentColor;flex-shrink:0}
+.wc{font-size:11px;color:var(--muted);white-space:nowrap}
+
+/* NOTEBOOK */
+.nbw{position:relative;margin-bottom:11px}
+.stk2{position:absolute;top:7px;right:5px;left:5px;bottom:-7px;border-radius:13px;filter:brightness(.9);z-index:0;transition:background .4s}
+.stk3{position:absolute;top:13px;right:10px;left:10px;bottom:-13px;border-radius:13px;filter:brightness(.83);z-index:0;transition:background .4s}
+.nb{position:relative;z-index:5}
+.nbc{border-radius:14px 14px 0 0;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:5px;transition:background .4s}
+.nbt{font-family:'Amiri',serif;font-size:14px;color:rgba(255,255,255,.8)}
+.nbi{font-size:11px;color:rgba(255,255,255,.45)}
+.nbp{border-radius:0 0 14px 14px;box-shadow:0 13px 45px rgba(0,0,0,.55);position:relative;overflow:hidden;transition:background .4s}
+.sph{position:absolute;right:-17px;top:0;bottom:0;width:34px;display:flex;flex-direction:column;justify-content:space-evenly;align-items:center;z-index:10;pointer-events:none}
+.sh{width:20px;height:20px;border-radius:50%;background:#b0b0b0;border:3px solid var(--cover);box-shadow:inset 0 1px 3px rgba(0,0,0,.4);transition:border-color .4s}
+.rph{position:absolute;right:-12px;top:0;bottom:0;width:24px;display:flex;flex-direction:column;justify-content:space-around;align-items:center;z-index:10;pointer-events:none}
+.rh{width:21px;height:26px;border-radius:50%;border:4px solid var(--cover);opacity:.75;transition:border-color .4s}
+.ml{position:absolute;right:50px;top:0;bottom:0;width:2px;background:rgba(255,100,100,.15);z-index:1;pointer-events:none}
+.ta{width:100%;min-height:500px;background:transparent;border:none;resize:none;font-family:'Tajawal',sans-serif;line-height:2.1;color:var(--ink);direction:rtl;padding:22px 65px 26px 22px;outline:none;transition:color .4s,font-size .2s}
+.ta::placeholder{opacity:.36}
+.eb{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);color:#fca5a5;padding:10px 14px;border-radius:9px;margin-bottom:10px;font-size:13px;display:none}
+.hint{background:rgba(245,200,66,.05);border:1px solid rgba(245,200,66,.14);border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#94a3b8;line-height:2}
+.hint strong{color:var(--gold)}
+kbd{background:#ffffff13;padding:2px 5px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--gold);border:1px solid #ffffff1a}
+@media(max-width:540px){.ta{padding:16px 50px 18px 12px}#app{padding:12px 9px 60px}.sym-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- SETTINGS OVERLAY -->
+<div id="sov" class="ov" onclick="closeSets()">
+<div class="panel" onclick="event.stopPropagation()" style="width:min(400px,95vw)">
+  <h3>⚙️ تخصيص الكشكول <button class="cx" onclick="closeSets()">✕</button></h3>
+  <div class="ss"><div class="sl">نوع التجليد</div><div class="sr" id="bg">
+    <button class="so on" data-v="spiral" onclick="pick('bind',this)">🌀 سبيرال</button>
+    <button class="so" data-v="rings" onclick="pick('bind',this)">💍 حلقات</button>
+    <button class="so" data-v="plain" onclick="pick('bind',this)">📓 عادي</button>
+  </div></div>
+  <div class="ss"><div class="sl">خطوط الورق</div><div class="sr" id="lg">
+    <button class="so on" data-v="ruled" onclick="pick('lines',this)">مسطرة</button>
+    <button class="so" data-v="grid" onclick="pick('lines',this)">مربعات</button>
+    <button class="so" data-v="dots" onclick="pick('lines',this)">نقاط</button>
+    <button class="so" data-v="blank" onclick="pick('lines',this)">بدون</button>
+  </div></div>
+  <div class="ss"><div class="sl">حجم الخط</div><div class="sr" id="szg">
+    <button class="so" data-v="13" onclick="pick('sz',this)">صغير</button>
+    <button class="so on" data-v="15.5" onclick="pick('sz',this)">متوسط</button>
+    <button class="so" data-v="18" onclick="pick('sz',this)">كبير</button>
+    <button class="so" data-v="21" onclick="pick('sz',this)">أكبر</button>
+  </div></div>
+  <div class="ss"><div class="sl">لون الغلاف</div><div class="sr">
+    <div class="cd on" style="background:#1e3a5f" data-t="cover" data-v="#1e3a5f" onclick="pickC(this)"></div>
+    <div class="cd" style="background:#1a4731" data-t="cover" data-v="#1a4731" onclick="pickC(this)"></div>
+    <div class="cd" style="background:#7f1d1d" data-t="cover" data-v="#7f1d1d" onclick="pickC(this)"></div>
+    <div class="cd" style="background:#3d1f0a" data-t="cover" data-v="#3d1f0a" onclick="pickC(this)"></div>
+    <div class="cd" style="background:#3b1f6e" data-t="cover" data-v="#3b1f6e" onclick="pickC(this)"></div>
+    <div class="cd" style="background:#0f4c5c" data-t="cover" data-v="#0f4c5c" onclick="pickC(this)"></div>
+    <div class="cd" style="background:#1f2937" data-t="cover" data-v="#1f2937" onclick="pickC(this)"></div>
+    <div class="cd" style="background:#4a1942" data-t="cover" data-v="#4a1942" onclick="pickC(this)"></div>
+    <div class="cd" style="background:#831843" data-t="cover" data-v="#831843" onclick="pickC(this)" title="وردي غامق"></div>
+    <div class="cd" style="background:#be185d" data-t="cover" data-v="#be185d" onclick="pickC(this)" title="بينك"></div>
+    <div class="cd" style="background:#9d174d" data-t="cover" data-v="#9d174d" onclick="pickC(this)" title="فوشيا"></div>
+    <div class="cd" style="background:#0e7490" data-t="cover" data-v="#0e7490" onclick="pickC(this)" title="سيان"></div>
+  </div></div>
+  <div class="ss"><div class="sl">لون الورق</div><div class="sr">
+    <div class="cd on" style="background:#fdf8f0;border-color:#ddd" data-t="paper" data-v="#fdf8f0" onclick="pickC(this)"></div>
+    <div class="cd" style="background:#ffffff;border-color:#ddd" data-t="paper" data-v="#ffffff" onclick="pickC(this)"></div>
+    <div class="cd" style="background:#fffde7;border-color:#ddd" data-t="paper" data-v="#fffde7" onclick="pickC(this)"></div>
+    <div class="cd" style="background:#f0faf4;border-color:#ddd" data-t="paper" data-v="#f0faf4" onclick="pickC(this)"></div>
+    <div class="cd" style="background:#fdf0f8;border-color:#ddd" data-t="paper" data-v="#fdf0f8" onclick="pickC(this)"></div>
+    <div class="cd" style="background:#fce7f3;border-color:#ddd" data-t="paper" data-v="#fce7f3" onclick="pickC(this)" title="بينك فاتح"></div>
+    <div class="cd" style="background:#fdf2f8;border-color:#ddd" data-t="paper" data-v="#fdf2f8" onclick="pickC(this)" title="وردي ناعم"></div>
+    <div class="cd" style="background:#eef2ff;border-color:#ddd" data-t="paper" data-v="#eef2ff" onclick="pickC(this)"></div>
+    <div class="cd" style="background:#ecfdf5;border-color:#ddd" data-t="paper" data-v="#ecfdf5" onclick="pickC(this)" title="نعناعي"></div>
+    <div class="cd" style="background:#1a1a2e;border-color:#555" data-t="paper" data-v="#1a1a2e" onclick="pickC(this)"></div>
+    <div class="cd" style="background:#1e1e2e;border-color:#555" data-t="paper" data-v="#1e1e2e" onclick="pickC(this)" title="داكن بنفسجي"></div>
+  </div></div>
+  <div class="ss"><div class="sl">لون الحبر</div><div class="sr">
+    <div class="cd on" style="background:#1a3a6e" data-t="ink" data-v="#1a3a6e" onclick="pickC(this)"></div>
+    <div class="cd" style="background:#0f172a" data-t="ink" data-v="#0f172a" onclick="pickC(this)"></div>
+    <div class="cd" style="background:#14532d" data-t="ink" data-v="#14532d" onclick="pickC(this)"></div>
+    <div class="cd" style="background:#4c1d95" data-t="ink" data-v="#4c1d95" onclick="pickC(this)"></div>
+    <div class="cd" style="background:#7f1d1d" data-t="ink" data-v="#7f1d1d" onclick="pickC(this)"></div>
+    <div class="cd" style="background:#374151" data-t="ink" data-v="#374151" onclick="pickC(this)"></div>
+    <div class="cd" style="background:#831843" data-t="ink" data-v="#831843" onclick="pickC(this)" title="وردي غامق"></div>
+    <div class="cd" style="background:#be185d" data-t="ink" data-v="#be185d" onclick="pickC(this)" title="بينك"></div>
+    <div class="cd" style="background:#e2e8f0" data-t="ink" data-v="#e2e8f0" onclick="pickC(this)"></div>
+  </div></div>
+</div>
+</div>
+
+<!-- SYMBOLS OVERLAY -->
+<div id="symsov" class="ov" onclick="closeSyms()">
+<div class="panel" onclick="event.stopPropagation()">
+  <h3>🔣 قاموس الرموز الكامل <button class="cx" onclick="closeSyms()">✕</button></h3>
+  <p class="panel-sub">اضغط لإدراج الرمز في الكشكول — أو قوليه بصوتك وهيتكتب تلقائياً</p>
+  <input id="sym-search" placeholder="🔍 ابحث عن رمز أو كلمة..." oninput="filterSyms()"/>
+  <div class="sym-cats" id="symCats"></div>
+  <div class="sym-count" id="symCount"></div>
+  <div class="sym-grid" id="symGrid"></div>
+</div>
+</div>
+
+<div id="flash"></div>
+
+<!-- TOP BAR -->
+<div id="bar">
+  <div class="logo">
+    <div class="li" id="li">📓</div>
+    <div><div class="ln">كشكول تيغو</div><span class="ls">اكتب وسجّل بحرية</span></div>
+  </div>
+  <div class="tbs">
+    <button class="tb" style="border-color:rgba(245,200,66,.3);color:var(--gold)" onclick="openSets()">⚙️</button>
+    <button class="tb" style="border-color:rgba(100,180,255,.3);color:#93c5fd" onclick="openSyms()">🔣 الرموز</button>
+    <button class="tb" style="border-color:rgba(100,200,100,.3);color:#6ee7b7" id="cpyBtn" onclick="copyAll()">📋 نسخ</button>
+    <button class="tb" style="border-color:rgba(200,100,100,.3);color:#f87171" onclick="clearAll()">🗑️</button>
+  </div>
+</div>
+
+<div id="app">
+  <div class="hint fu">
+    🎤 اضغطي زرار <strong>سجّل</strong> للتسجيل بصوتك &nbsp;|&nbsp; أو اكتبي يدوياً &nbsp;|&nbsp; اضغطي <strong style="color:var(--gold)">🔣 الرموز</strong> لإدراج أي رمز
+  </div>
+
+  <div id="vb">
+    <div class="rd"></div>
+    <div class="ws"><div class="wv"></div><div class="wv"></div><div class="wv"></div><div class="wv"></div><div class="wv"></div></div>
+    <div class="rt" id="rtime">00:00</div>
+    <div class="rl" id="rlang">جاري التسجيل...</div>
+    <button class="sbt" onclick="stopRec()">⏹ إيقاف</button>
+  </div>
+
+  <div class="rrow fu">
+    <select class="lsel" id="lsel">
+      <option value="ar-EG">🇪🇬 عربي مصري</option>
+      <option value="ar-SA">🇸🇦 عربي فصحى</option>
+      <option value="ar">🌍 عربي عام</option>
+      <option value="en-US">🇺🇸 English</option>
+      <option value="fr-FR">🇫🇷 Français</option>
+    </select>
+    <button class="rbtn" onclick="startRec()" id="rbtn">
+      <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3zm0 2a1 1 0 0 1 1 1v8a1 1 0 0 1-2 0V4a1 1 0 0 1 1-1zm-7 9h2a5 5 0 0 0 10 0h2a7 7 0 0 1-6 6.92V21h2v2H9v-2h2v-2.08A7 7 0 0 1 5 12z"/></svg>
+      🎤 سجّل
+    </button>
+    <div class="wc" id="wc">0 كلمة</div>
+  </div>
+
+  <div class="eb" id="eb"></div>
+
+  <div class="nbw fu">
+    <div class="stk2" id="s2"></div>
+    <div class="stk3" id="s3"></div>
+    <div class="nb">
+      <div class="nbc" id="nbc">
+        <span class="nbi" id="pgi">الصفحة 1</span>
+        <span class="nbt">📝 ملاحظاتي</span>
+        <span class="nbi" id="chi">0 حرف</span>
+      </div>
+      <div class="nbp" id="nbp">
+        <div class="ml" id="ml"></div>
+        <div class="sph" id="sph"></div>
+        <div class="rph" id="rph"></div>
+        <textarea id="ta" class="ta" placeholder="ابدأي الكتابة... أو 🎤 سجّلي" dir="auto" oninput="onIn()" onscroll="onScr()"></textarea>
+      </div>
+    </div>
+  </div>
+  <div id="pind" style="text-align:center;color:var(--muted);font-size:11px;margin-top:5px"></div>
+</div>
+
+<script>
+/* ════════════════════════════════════════════════════════════════
+   MEGA SYMBOL DICTIONARY  — 350+ entries
+   Format: {cat, words:[], sym, label}
+   words[0] = main trigger word (shown in UI)
+════════════════════════════════════════════════════════════════ */
+const SYMS = [
+
+/* ── GREEK LETTERS ─────────────────────────────────────────── */
+{cat:'يونانية',words:['alpha','ألفا','alfa'],sym:'α',label:'ألفا α'},
+{cat:'يونانية',words:['Alpha','ألفا كبيرة'],sym:'Α',label:'ألفا كبيرة Α'},
+{cat:'يونانية',words:['beta','بيتا','بيتا صغيرة'],sym:'β',label:'بيتا β'},
+{cat:'يونانية',words:['Beta','بيتا كبيرة'],sym:'Β',label:'بيتا كبيرة Β'},
+{cat:'يونانية',words:['gamma','جاما'],sym:'γ',label:'جاما γ'},
+{cat:'يونانية',words:['Gamma','جاما كبيرة'],sym:'Γ',label:'جاما كبيرة Γ'},
+{cat:'يونانية',words:['delta','دلتا'],sym:'δ',label:'دلتا δ'},
+{cat:'يونانية',words:['Delta','دلتا كبيرة','التغيير'],sym:'Δ',label:'دلتا كبيرة Δ'},
+{cat:'يونانية',words:['epsilon','إبسيلون','ابسيلون','الخطأ العشوائي'],sym:'ε',label:'إبسيلون ε'},
+{cat:'يونانية',words:['zeta','زيتا'],sym:'ζ',label:'زيتا ζ'},
+{cat:'يونانية',words:['eta','إيتا','ايتا'],sym:'η',label:'إيتا η'},
+{cat:'يونانية',words:['theta','تيتا'],sym:'θ',label:'تيتا θ'},
+{cat:'يونانية',words:['Theta','تيتا كبيرة'],sym:'Θ',label:'تيتا كبيرة Θ'},
+{cat:'يونانية',words:['iota','يوتا'],sym:'ι',label:'يوتا ι'},
+{cat:'يونانية',words:['kappa','كابا'],sym:'κ',label:'كابا κ'},
+{cat:'يونانية',words:['lambda','لامبدا','لامدا'],sym:'λ',label:'لامبدا λ'},
+{cat:'يونانية',words:['Lambda','لامبدا كبيرة'],sym:'Λ',label:'لامبدا كبيرة Λ'},
+{cat:'يونانية',words:['mu','ميو','المتوسط الحقيقي'],sym:'μ',label:'ميو μ'},
+{cat:'يونانية',words:['nu','نو'],sym:'ν',label:'نو ν'},
+{cat:'يونانية',words:['xi','كساي'],sym:'ξ',label:'كساي ξ'},
+{cat:'يونانية',words:['pi','باي'],sym:'π',label:'باي π'},
+{cat:'يونانية',words:['Pi','باي كبيرة','حاصل ضرب متتالي'],sym:'Π',label:'باي كبيرة Π'},
+{cat:'يونانية',words:['rho','رو'],sym:'ρ',label:'رو ρ'},
+{cat:'يونانية',words:['sigma','سيجما','سيجما صغيرة'],sym:'σ',label:'سيجما σ'},
+{cat:'يونانية',words:['Sigma','سيجما كبيرة','المجموع','مجموع'],sym:'Σ',label:'سيجما كبيرة Σ'},
+{cat:'يونانية',words:['tau','تاو'],sym:'τ',label:'تاو τ'},
+{cat:'يونانية',words:['upsilon','أبسيلون'],sym:'υ',label:'أبسيلون υ'},
+{cat:'يونانية',words:['phi','فاي'],sym:'φ',label:'فاي φ'},
+{cat:'يونانية',words:['Phi','فاي كبيرة'],sym:'Φ',label:'فاي كبيرة Φ'},
+{cat:'يونانية',words:['chi','كاي'],sym:'χ',label:'كاي χ'},
+{cat:'يونانية',words:['psi','سي'],sym:'ψ',label:'سي ψ'},
+{cat:'يونانية',words:['Psi','سي كبيرة'],sym:'Ψ',label:'سي كبيرة Ψ'},
+{cat:'يونانية',words:['omega','أوميجا'],sym:'ω',label:'أوميجا ω'},
+{cat:'يونانية',words:['Omega','أوميجا كبيرة'],sym:'Ω',label:'أوميجا كبيرة Ω'},
+
+/* ── STATISTICS ────────────────────────────────────────────── */
+{cat:'إحصاء',words:['x bar','إكس بار','xbar','متوسط العينة'],sym:'x̄',label:'x̄ متوسط العينة'},
+{cat:'إحصاء',words:['y hat','واي هات','القيمة المتنبأ','yhat'],sym:'ŷ',label:'ŷ القيمة المتنبأ'},
+{cat:'إحصاء',words:['x hat','إكس هات'],sym:'x̂',label:'x̂ إكس هات'},
+{cat:'إحصاء',words:['p hat','بي هات','نسبة العينة'],sym:'p̂',label:'p̂ نسبة العينة'},
+{cat:'إحصاء',words:['variance','التباين','سيجما تربيع'],sym:'σ²',label:'σ² التباين'},
+{cat:'إحصاء',words:['sample variance','تباين العينة','s تربيع'],sym:'s²',label:'s² تباين العينة'},
+{cat:'إحصاء',words:['standard deviation','الانحراف المعياري'],sym:'σ',label:'σ الانحراف المعياري'},
+{cat:'إحصاء',words:['sample std','انحراف العينة'],sym:'s',label:'s انحراف معياري العينة'},
+{cat:'إحصاء',words:['standard error','الخطأ المعياري'],sym:'SE',label:'SE الخطأ المعياري'},
+{cat:'إحصاء',words:['R squared','r تربيع','معامل التحديد'],sym:'R²',label:'R² معامل التحديد'},
+{cat:'إحصاء',words:['adjusted R squared','r تربيع معدل'],sym:'R̄²',label:'R̄² معدل'},
+{cat:'إحصاء',words:['correlation','معامل الارتباط بيرسون'],sym:'r',label:'r معامل الارتباط'},
+{cat:'إحصاء',words:['spearman','سبيرمان'],sym:'ρ',label:'ρ سبيرمان'},
+{cat:'إحصاء',words:['H zero','H صفر','الفرضية الصفرية','null hypothesis'],sym:'H₀',label:'H₀ الفرضية الصفرية'},
+{cat:'إحصاء',words:['H one','H واحد','الفرضية البديلة'],sym:'H₁',label:'H₁ الفرضية البديلة'},
+{cat:'إحصاء',words:['p value','بي فاليو','قيمة p'],sym:'p-value',label:'p-value'},
+{cat:'إحصاء',words:['confidence interval','فترة الثقة'],sym:'CI',label:'CI فترة الثقة'},
+{cat:'إحصاء',words:['significance level','مستوى الدلالة'],sym:'α = 0.05',label:'α مستوى الدلالة'},
+{cat:'إحصاء',words:['z score','z درجة','درجة معيارية'],sym:'Z',label:'Z-score'},
+{cat:'إحصاء',words:['z test','زد تست'],sym:'Z-test',label:'Z-test'},
+{cat:'إحصاء',words:['t test','تي تيست','اختبار t'],sym:'t-test',label:'t-test'},
+{cat:'إحصاء',words:['chi square','مربع كاي'],sym:'χ²',label:'χ² مربع كاي'},
+{cat:'إحصاء',words:['f test','اختبار f'],sym:'F-test',label:'F-test'},
+{cat:'إحصاء',words:['anova','أنوفا','تحليل التباين'],sym:'ANOVA',label:'ANOVA'},
+{cat:'إحصاء',words:['two way anova','أنوفا ثنائي'],sym:'Two-Way ANOVA',label:'Two-Way ANOVA'},
+{cat:'إحصاء',words:['probability','احتمال'],sym:'P()',label:'P() الاحتمال'},
+{cat:'إحصاء',words:['conditional probability','احتمال شرطي'],sym:'P(A|B)',label:'P(A|B) احتمال شرطي'},
+{cat:'إحصاء',words:['bayes theorem','نظرية بايز'],sym:'P(A|B)=P(B|A)P(A)/P(B)',label:'نظرية بايز'},
+{cat:'إحصاء',words:['expected value','القيمة المتوقعة','التوقع الرياضي'],sym:'E(X)',label:'E(X) القيمة المتوقعة'},
+{cat:'إحصاء',words:['variance of x','تباين إكس'],sym:'Var(X)',label:'Var(X)'},
+{cat:'إحصاء',words:['covariance','التغاير','كوفريانس'],sym:'Cov(X,Y)',label:'Cov(X,Y) التغاير'},
+{cat:'إحصاء',words:['normal distribution','التوزيع الطبيعي'],sym:'N(μ,σ²)',label:'N(μ,σ²) توزيع طبيعي'},
+{cat:'إحصاء',words:['binomial distribution','التوزيع ثنائي الحد'],sym:'B(n,p)',label:'B(n,p) ثنائي الحد'},
+{cat:'إحصاء',words:['poisson distribution','توزيع بواسون'],sym:'Pois(λ)',label:'Pois(λ) بواسون'},
+{cat:'إحصاء',words:['uniform distribution','التوزيع المنتظم'],sym:'U(a,b)',label:'U(a,b) منتظم'},
+{cat:'إحصاء',words:['exponential distribution','التوزيع الأسي'],sym:'Exp(λ)',label:'Exp(λ) أسي'},
+{cat:'إحصاء',words:['sample size','حجم العينة'],sym:'n',label:'n حجم العينة'},
+{cat:'إحصاء',words:['population size','حجم المجتمع'],sym:'N',label:'N حجم المجتمع'},
+{cat:'إحصاء',words:['degrees of freedom','درجات الحرية'],sym:'df = n-1',label:'df درجات الحرية'},
+{cat:'إحصاء',words:['median','الوسيط'],sym:'Md',label:'Md الوسيط'},
+{cat:'إحصاء',words:['mode','المنوال'],sym:'Mo',label:'Mo المنوال'},
+{cat:'إحصاء',words:['range','المدى'],sym:'Range = max-min',label:'Range المدى'},
+{cat:'إحصاء',words:['IQR','interquartile range','المدى الربيعي'],sym:'IQR = Q3-Q1',label:'IQR المدى الربيعي'},
+{cat:'إحصاء',words:['skewness','الالتواء'],sym:'γ₁',label:'γ₁ الالتواء'},
+{cat:'إحصاء',words:['kurtosis','التفرطح'],sym:'γ₂',label:'γ₂ التفرطح'},
+{cat:'إحصاء',words:['first quartile','الربع الأول'],sym:'Q1',label:'Q1'},
+{cat:'إحصاء',words:['second quartile','الربع الثاني'],sym:'Q2',label:'Q2'},
+{cat:'إحصاء',words:['third quartile','الربع الثالث'],sym:'Q3',label:'Q3'},
+{cat:'إحصاء',words:['percentile','البيرسينتايل','المئيني'],sym:'P_k',label:'P_k المئيني'},
+{cat:'إحصاء',words:['regression','معادلة الانحدار'],sym:'ŷ = β₀ + β₁x + ε',label:'معادلة الانحدار البسيط'},
+{cat:'إحصاء',words:['multiple regression','انحدار متعدد'],sym:'ŷ = β₀ + β₁x₁ + β₂x₂ + ε',label:'الانحدار المتعدد'},
+{cat:'إحصاء',words:['beta zero','بيتا صفر','الحد الثابت'],sym:'β₀',label:'β₀ الحد الثابت'},
+{cat:'إحصاء',words:['beta one','بيتا واحد','ميل الخط'],sym:'β₁',label:'β₁ ميل الخط'},
+{cat:'إحصاء',words:['residual','البواقي','الخطأ'],sym:'e = y - ŷ',label:'e البواقي'},
+{cat:'إحصاء',words:['MSE','mean squared error','متوسط مربع الخطأ'],sym:'MSE',label:'MSE'},
+{cat:'إحصاء',words:['RMSE','جذر متوسط مربع الخطأ'],sym:'RMSE',label:'RMSE'},
+{cat:'إحصاء',words:['MAE','mean absolute error','متوسط الخطأ المطلق'],sym:'MAE',label:'MAE'},
+{cat:'إحصاء',words:['MAPE','متوسط الخطأ النسبي'],sym:'MAPE',label:'MAPE'},
+{cat:'إحصاء',words:['RSS','residual sum of squares','مجموع مربعات البواقي'],sym:'RSS = Σ(yᵢ-ŷᵢ)²',label:'RSS'},
+{cat:'إحصاء',words:['TSS','total sum of squares'],sym:'TSS = Σ(yᵢ-ȳ)²',label:'TSS'},
+{cat:'إحصاء',words:['log likelihood','اللوق لايكليهود'],sym:'ℓ(θ)',label:'ℓ(θ) Log-Likelihood'},
+{cat:'إحصاء',words:['MLE','maximum likelihood','أعظم احتمالية'],sym:'MLE',label:'MLE'},
+{cat:'إحصاء',words:['AIC','معيار أكيكي'],sym:'AIC = 2k - 2ln(L)',label:'AIC'},
+{cat:'إحصاء',words:['BIC','معيار بايز'],sym:'BIC',label:'BIC'},
+
+/* ── MATH OPERATORS ────────────────────────────────────────── */
+{cat:'رياضيات',words:['approximately','تقريباً','يساوي تقريباً'],sym:'≈',label:'يساوي تقريباً ≈'},
+{cat:'رياضيات',words:['not equal','لا يساوي','مش يساوي'],sym:'≠',label:'لا يساوي ≠'},
+{cat:'رياضيات',words:['greater or equal','أكبر أو يساوي'],sym:'≥',label:'أكبر أو يساوي ≥'},
+{cat:'رياضيات',words:['less or equal','أصغر أو يساوي'],sym:'≤',label:'أصغر أو يساوي ≤'},
+{cat:'رياضيات',words:['much greater','أكبر بكثير'],sym:'≫',label:'أكبر بكثير ≫'},
+{cat:'رياضيات',words:['much less','أصغر بكثير'],sym:'≪',label:'أصغر بكثير ≪'},
+{cat:'رياضيات',words:['plus minus','زائد أو ناقص'],sym:'±',label:'زائد/ناقص ±'},
+{cat:'رياضيات',words:['times','ضرب في'],sym:'×',label:'ضرب ×'},
+{cat:'رياضيات',words:['divided','قسمة على'],sym:'÷',label:'قسمة ÷'},
+{cat:'رياضيات',words:['square root','جذر تربيعي'],sym:'√',label:'جذر تربيعي √'},
+{cat:'رياضيات',words:['cube root','جذر تكعيبي'],sym:'∛',label:'جذر تكعيبي ∛'},
+{cat:'رياضيات',words:['fourth root','جذر رباعي'],sym:'∜',label:'جذر رباعي ∜'},
+{cat:'رياضيات',words:['infinity','لا نهاية'],sym:'∞',label:'لا نهاية ∞'},
+{cat:'رياضيات',words:['proportional','يتناسب طرديا مع'],sym:'∝',label:'يتناسب مع ∝'},
+{cat:'رياضيات',words:['squared','تربيع'],sym:'²',label:'مربع ²'},
+{cat:'رياضيات',words:['cubed','مكعب'],sym:'³',label:'مكعب ³'},
+{cat:'رياضيات',words:['to the n','أس n'],sym:'ⁿ',label:'أس n ⁿ'},
+{cat:'رياضيات',words:['to the power','مرفوع للأس'],sym:'^',label:'^ الأس'},
+{cat:'رياضيات',words:['therefore','إذن','بالتالي'],sym:'∴',label:'إذن ∴'},
+{cat:'رياضيات',words:['because','لأن','بما أن'],sym:'∵',label:'لأن ∵'},
+{cat:'رياضيات',words:['floor','الجزء الصحيح الأصغر'],sym:'⌊x⌋',label:'⌊⌋ floor'},
+{cat:'رياضيات',words:['ceiling','الجزء الصحيح الأكبر'],sym:'⌈x⌉',label:'⌈⌉ ceiling'},
+{cat:'رياضيات',words:['absolute value','القيمة المطلقة','مطلق'],sym:'|x|',label:'|x| القيمة المطلقة'},
+{cat:'رياضيات',words:['factorial','مضروب'],sym:'n!',label:'n! المضروب'},
+{cat:'رياضيات',words:['combination','توافيق'],sym:'C(n,r)',label:'C(n,r) توافيق'},
+{cat:'رياضيات',words:['permutation','تبادلات','ترتيبات'],sym:'P(n,r)',label:'P(n,r) ترتيبات'},
+{cat:'رياضيات',words:['log','لوغاريتم'],sym:'log(x)',label:'log(x)'},
+{cat:'رياضيات',words:['natural log','اللوغاريتم الطبيعي','لن'],sym:'ln(x)',label:'ln(x) طبيعي'},
+{cat:'رياضيات',words:['log base 2','لوغاريتم اساسه اثنان'],sym:'log₂(x)',label:'log₂(x)'},
+{cat:'رياضيات',words:['log base 10','لوغاريتم عشري'],sym:'log₁₀(x)',label:'log₁₀(x)'},
+{cat:'رياضيات',words:['exponential','الدالة الأسية','e أس x'],sym:'eˣ',label:'eˣ الدالة الأسية'},
+{cat:'رياضيات',words:['euler number','رقم أويلر'],sym:'e ≈ 2.718',label:'e رقم أويلر'},
+{cat:'رياضيات',words:['modulo','باقي القسمة','مودولو'],sym:'mod',label:'mod باقي القسمة'},
+{cat:'رياضيات',words:['real numbers','الأعداد الحقيقية'],sym:'ℝ',label:'ℝ الأعداد الحقيقية'},
+{cat:'رياضيات',words:['natural numbers','الأعداد الطبيعية'],sym:'ℕ',label:'ℕ الأعداد الطبيعية'},
+{cat:'رياضيات',words:['integers','الأعداد الصحيحة'],sym:'ℤ',label:'ℤ الأعداد الصحيحة'},
+{cat:'رياضيات',words:['rational numbers','الأعداد النسبية'],sym:'ℚ',label:'ℚ الأعداد النسبية'},
+{cat:'رياضيات',words:['complex numbers','الأعداد المركبة'],sym:'ℂ',label:'ℂ الأعداد المركبة'},
+{cat:'رياضيات',words:['imaginary unit','الوحدة التخيلية'],sym:'i = √(-1)',label:'i الوحدة التخيلية'},
+
+/* ── CALCULUS ──────────────────────────────────────────────── */
+{cat:'تفاضل وتكامل',words:['integral','تكامل محدد'],sym:'∫',label:'∫ تكامل'},
+{cat:'تفاضل وتكامل',words:['definite integral','تكامل محدد من a إلى b'],sym:'∫ₐᵇ f(x)dx',label:'∫ₐᵇ تكامل محدد'},
+{cat:'تفاضل وتكامل',words:['double integral','تكامل مزدوج'],sym:'∬',label:'∬ تكامل مزدوج'},
+{cat:'تفاضل وتكامل',words:['triple integral','تكامل ثلاثي'],sym:'∭',label:'∭ تكامل ثلاثي'},
+{cat:'تفاضل وتكامل',words:['partial derivative','مشتقة جزئية'],sym:'∂f/∂x',label:'∂f/∂x مشتقة جزئية'},
+{cat:'تفاضل وتكامل',words:['gradient','جراديانت','نابلا'],sym:'∇f',label:'∇f الجراديانت'},
+{cat:'تفاضل وتكامل',words:['divergence','التباعد'],sym:'∇·F',label:'∇·F التباعد'},
+{cat:'تفاضل وتكامل',words:['curl','الدوران'],sym:'∇×F',label:'∇×F الدوران'},
+{cat:'تفاضل وتكامل',words:['laplacian','اللابلاسيان'],sym:'∇²f',label:'∇²f اللابلاسيان'},
+{cat:'تفاضل وتكامل',words:['limit','النهاية'],sym:'lim_{x→a}',label:'lim النهاية'},
+{cat:'تفاضل وتكامل',words:['limit to infinity','نهاية عند اللانهاية'],sym:'lim_{x→∞}',label:'lim x→∞'},
+{cat:'تفاضل وتكامل',words:['derivative','المشتقة'],sym:"f'(x)",label:"f'(x) المشتقة"},
+{cat:'تفاضل وتكامل',words:['second derivative','المشتقة الثانية'],sym:"f''(x)",label:"f''(x) المشتقة الثانية"},
+{cat:'تفاضل وتكامل',words:['nth derivative','المشتقة من الدرجة n'],sym:'f⁽ⁿ⁾(x)',label:'fⁿ المشتقة النونية'},
+{cat:'تفاضل وتكامل',words:['chain rule','قاعدة السلسلة'],sym:'dy/dx = dy/du · du/dx',label:'قاعدة السلسلة'},
+{cat:'تفاضل وتكامل',words:['product rule','قاعدة الضرب'],sym:"(uv)' = u'v + uv'",label:'قاعدة الضرب'},
+{cat:'تفاضل وتكامل',words:['quotient rule','قاعدة القسمة'],sym:"(u/v)' = (u'v-uv')/v²",label:'قاعدة القسمة'},
+{cat:'تفاضل وتكامل',words:['taylor series','متسلسلة تايلور'],sym:'f(x) = Σ f⁽ⁿ⁾(a)/n! (x-a)ⁿ',label:'متسلسلة تايلور'},
+{cat:'تفاضل وتكامل',words:['fourier transform','تحويل فورييه'],sym:'F(ω) = ∫f(t)e⁻ⁱωᵗdt',label:'تحويل فورييه'},
+
+/* ── LINEAR ALGEBRA ────────────────────────────────────────── */
+{cat:'جبر خطي',words:['matrix A','مصفوفة','ماتريكس'],sym:'A',label:'A مصفوفة'},
+{cat:'جبر خطي',words:['vector','متجه','فيكتور'],sym:'v⃗',label:'v⃗ متجه'},
+{cat:'جبر خطي',words:['transpose','المحوّل','ترانسبوز'],sym:'Aᵀ',label:'Aᵀ المحوّل'},
+{cat:'جبر خطي',words:['inverse','المعكوس','إنفيرس'],sym:'A⁻¹',label:'A⁻¹ المعكوس'},
+{cat:'جبر خطي',words:['pseudo inverse','المعكوس الزائف'],sym:'A⁺',label:'A⁺ المعكوس الزائف'},
+{cat:'جبر خطي',words:['determinant','المحدد','ديترمينانت'],sym:'det(A)',label:'det(A) المحدد'},
+{cat:'جبر خطي',words:['trace','أثر المصفوفة','تريس'],sym:'tr(A)',label:'tr(A) الأثر'},
+{cat:'جبر خطي',words:['rank','رتبة المصفوفة'],sym:'rank(A)',label:'rank(A) الرتبة'},
+{cat:'جبر خطي',words:['eigenvalue','القيمة الذاتية','ايجن فاليو'],sym:'λ',label:'λ القيمة الذاتية'},
+{cat:'جبر خطي',words:['eigenvector','المتجه الذاتي','ايجن فيكتور'],sym:'Av = λv',label:'Av=λv المعادلة الذاتية'},
+{cat:'جبر خطي',words:['dot product','الضرب النقطي','دوت برودكت'],sym:'a⃗·b⃗',label:'a⃗·b⃗ الضرب النقطي'},
+{cat:'جبر خطي',words:['cross product','الضرب الاتجاهي'],sym:'a⃗×b⃗',label:'a⃗×b⃗ الضرب الاتجاهي'},
+{cat:'جبر خطي',words:['norm','المعيار','نورم'],sym:'‖x‖',label:'‖x‖ المعيار'},
+{cat:'جبر خطي',words:['L1 norm','معيار L1'],sym:'‖x‖₁ = Σ|xᵢ|',label:'L1 norm'},
+{cat:'جبر خطي',words:['L2 norm','معيار L2','نورم إقليدي'],sym:'‖x‖₂ = √(Σxᵢ²)',label:'L2 norm'},
+{cat:'جبر خطي',words:['identity matrix','مصفوفة الهوية'],sym:'I',label:'I مصفوفة الهوية'},
+{cat:'جبر خطي',words:['zero matrix','مصفوفة الأصفار'],sym:'0',label:'0 مصفوفة الأصفار'},
+{cat:'جبر خطي',words:['diagonal matrix','مصفوفة قطرية'],sym:'diag(λ₁,...,λₙ)',label:'مصفوفة قطرية'},
+{cat:'جبر خطي',words:['SVD','singular value decomposition','تحليل القيمة المفردة'],sym:'A = UΣVᵀ',label:'SVD'},
+{cat:'جبر خطي',words:['PCA','principal component analysis','المكونات الرئيسية'],sym:'PCA',label:'PCA'},
+{cat:'جبر خطي',words:['span','الامتداد','فضاء امتداد'],sym:'span{v₁,...,vₙ}',label:'span الامتداد'},
+{cat:'جبر خطي',words:['linear combination','تركيب خطي'],sym:'c₁v₁ + c₂v₂',label:'التركيب الخطي'},
+{cat:'جبر خطي',words:['projection','الإسقاط'],sym:'proj_u(v) = (v·u/‖u‖²)u',label:'الإسقاط'},
+
+/* ── SETS & LOGIC ──────────────────────────────────────────── */
+{cat:'مجموعات',words:['element of','ينتمي إلى'],sym:'∈',label:'∈ ينتمي'},
+{cat:'مجموعات',words:['not element of','لا ينتمي'],sym:'∉',label:'∉ لا ينتمي'},
+{cat:'مجموعات',words:['subset','مجموعة جزئية'],sym:'⊆',label:'⊆ مجموعة جزئية'},
+{cat:'مجموعات',words:['proper subset','مجموعة جزئية حقيقية'],sym:'⊂',label:'⊂ مجموعة جزئية حقيقية'},
+{cat:'مجموعات',words:['superset','مجموعة عظمى'],sym:'⊇',label:'⊇ مجموعة عظمى'},
+{cat:'مجموعات',words:['intersection','تقاطع'],sym:'A∩B',label:'∩ تقاطع'},
+{cat:'مجموعات',words:['union','اتحاد'],sym:'A∪B',label:'∪ اتحاد'},
+{cat:'مجموعات',words:['complement','مكمل المجموعة'],sym:"A'",label:"A' المكمل"},
+{cat:'مجموعات',words:['difference','فرق المجموعتين'],sym:'A\\B',label:'A\\B الفرق'},
+{cat:'مجموعات',words:['empty set','مجموعة فارغة'],sym:'∅',label:'∅ مجموعة فارغة'},
+{cat:'مجموعات',words:['for all','لكل'],sym:'∀',label:'∀ لكل'},
+{cat:'مجموعات',words:['there exists','يوجد'],sym:'∃',label:'∃ يوجد'},
+{cat:'مجموعات',words:['there exists unique','يوجد وحيد'],sym:'∃!',label:'∃! يوجد وحيد'},
+{cat:'مجموعات',words:['implies','يستلزم','إذا... إذن'],sym:'⟹',label:'⟹ يستلزم'},
+{cat:'مجموعات',words:['if and only if','إذا وفقط إذا','يكافئ'],sym:'⟺',label:'⟺ إذا وفقط إذا'},
+{cat:'مجموعات',words:['and','و','conjunction'],sym:'∧',label:'∧ و'},
+{cat:'مجموعات',words:['or','أو','disjunction'],sym:'∨',label:'∨ أو'},
+{cat:'مجموعات',words:['not','ليس','نفي'],sym:'¬',label:'¬ ليس'},
+{cat:'مجموعات',words:['xor','إما أو'],sym:'⊕',label:'⊕ XOR'},
+{cat:'مجموعات',words:['power set','مجموعة القوى'],sym:'P(A)',label:'P(A) مجموعة القوى'},
+{cat:'مجموعات',words:['cardinality','عدد عناصر المجموعة'],sym:'|A|',label:'|A| الأساس'},
+
+/* ── ML / AI ───────────────────────────────────────────────── */
+{cat:'ML / AI',words:['accuracy','الدقة الكلية','أكيوراسي'],sym:'Accuracy = (TP+TN)/(TP+TN+FP+FN)',label:'Accuracy'},
+{cat:'ML / AI',words:['precision','البريسيجن','الدقة الإيجابية'],sym:'Precision = TP/(TP+FP)',label:'Precision'},
+{cat:'ML / AI',words:['recall','الاستدعاء','ريكول'],sym:'Recall = TP/(TP+FN)',label:'Recall'},
+{cat:'ML / AI',words:['f1 score','f1 سكور'],sym:'F1 = 2·(P·R)/(P+R)',label:'F1-Score'},
+{cat:'ML / AI',words:['AUC','مساحة تحت المنحنى'],sym:'AUC-ROC',label:'AUC-ROC'},
+{cat:'ML / AI',words:['true positive','إيجابية حقيقية'],sym:'TP',label:'TP True Positive'},
+{cat:'ML / AI',words:['true negative','سلبية حقيقية'],sym:'TN',label:'TN True Negative'},
+{cat:'ML / AI',words:['false positive','إيجابية خاطئة','خطأ من النوع الأول'],sym:'FP',label:'FP False Positive'},
+{cat:'ML / AI',words:['false negative','سلبية خاطئة','خطأ من النوع الثاني'],sym:'FN',label:'FN False Negative'},
+{cat:'ML / AI',words:['loss function','دالة الخسارة'],sym:'L(θ)',label:'L(θ) دالة الخسارة'},
+{cat:'ML / AI',words:['cross entropy loss','خسارة الإنتروبيا'],sym:'L = -Σ yᵢ log(ŷᵢ)',label:'Cross Entropy Loss'},
+{cat:'ML / AI',words:['MSE loss','خسارة مربع الخطأ'],sym:'L = (1/n)Σ(yᵢ-ŷᵢ)²',label:'MSE Loss'},
+{cat:'ML / AI',words:['gradient descent','نزول التدرج'],sym:'θ := θ - α∇J(θ)',label:'Gradient Descent'},
+{cat:'ML / AI',words:['stochastic gradient descent','SGD','نزول عشوائي'],sym:'SGD',label:'SGD'},
+{cat:'ML / AI',words:['adam optimizer','أدم','آدم أوبتيمايزر'],sym:'Adam',label:'Adam Optimizer'},
+{cat:'ML / AI',words:['learning rate','معدل التعلم'],sym:'α',label:'α معدل التعلم'},
+{cat:'ML / AI',words:['weight','وزن','الأوزان'],sym:'w',label:'w الأوزان'},
+{cat:'ML / AI',words:['bias','الانحياز','البياس'],sym:'b',label:'b الانحياز'},
+{cat:'ML / AI',words:['sigmoid','سيجمويد'],sym:'σ(x) = 1/(1+e⁻ˣ)',label:'Sigmoid'},
+{cat:'ML / AI',words:['relu','ريلو','rectified linear'],sym:'ReLU(x) = max(0,x)',label:'ReLU'},
+{cat:'ML / AI',words:['leaky relu','ليكي ريلو'],sym:'LeakyReLU(x)',label:'Leaky ReLU'},
+{cat:'ML / AI',words:['softmax','سوفت ماكس'],sym:'softmax(xᵢ) = eˣⁱ/Σeˣʲ',label:'Softmax'},
+{cat:'ML / AI',words:['tanh','تانج h'],sym:'tanh(x) = (eˣ-e⁻ˣ)/(eˣ+e⁻ˣ)',label:'tanh'},
+{cat:'ML / AI',words:['backpropagation','الانتشار العكسي'],sym:'∂L/∂w',label:'∂L/∂w الانتشار العكسي'},
+{cat:'ML / AI',words:['forward pass','التمرير الأمامي'],sym:'Forward Pass',label:'Forward Pass'},
+{cat:'ML / AI',words:['epoch','إيبوك'],sym:'epoch',label:'epoch دورة تدريب'},
+{cat:'ML / AI',words:['batch size','حجم الدفعة'],sym:'batch_size',label:'batch_size'},
+{cat:'ML / AI',words:['dropout','دروب اوت','الإسقاط العشوائي'],sym:'Dropout(p)',label:'Dropout'},
+{cat:'ML / AI',words:['batch normalization','تطبيع الدفعة'],sym:'BatchNorm',label:'Batch Normalization'},
+{cat:'ML / AI',words:['L2 regularization','ريدج','تنظيم L2'],sym:'λ‖w‖²',label:'L2 Regularization'},
+{cat:'ML / AI',words:['L1 regularization','لاسو','تنظيم L1'],sym:'λ‖w‖₁',label:'L1 Regularization'},
+{cat:'ML / AI',words:['elastic net','إيلاستيك نيت'],sym:'α‖w‖₁ + (1-α)‖w‖²',label:'Elastic Net'},
+{cat:'ML / AI',words:['overfitting','إفراط في التدريب','أوفرفيتنج'],sym:'▲Overfit',label:'Overfitting'},
+{cat:'ML / AI',words:['underfitting','ضعف التدريب','أندرفيتنج'],sym:'▽Underfit',label:'Underfitting'},
+{cat:'ML / AI',words:['bias variance tradeoff','تبادل الانحياز والتباين'],sym:'Error = Bias² + Variance + Noise',label:'Bias-Variance'},
+{cat:'ML / AI',words:['cross validation','التحقق المتقاطع'],sym:'CV',label:'Cross Validation'},
+{cat:'ML / AI',words:['k fold','k فولد'],sym:'K-Fold CV',label:'K-Fold CV'},
+{cat:'ML / AI',words:['KNN','k nearest neighbors','أقرب جار'],sym:'KNN',label:'KNN'},
+{cat:'ML / AI',words:['SVM','support vector machine','آلة المتجهات الداعمة'],sym:'SVM',label:'SVM'},
+{cat:'ML / AI',words:['kernel trick','حيلة النواة'],sym:'K(x,x\')=φ(x)·φ(x\')',label:'Kernel Trick'},
+{cat:'ML / AI',words:['random forest','الغابة العشوائية'],sym:'RandomForest',label:'Random Forest'},
+{cat:'ML / AI',words:['decision tree','شجرة القرار'],sym:'DecisionTree',label:'Decision Tree'},
+{cat:'ML / AI',words:['gradient boosting','جراديانت بوستنج'],sym:'GradientBoosting',label:'Gradient Boosting'},
+{cat:'ML / AI',words:['XGBoost','إكس جي بوست'],sym:'XGBoost',label:'XGBoost'},
+{cat:'ML / AI',words:['logistic regression','انحدار لوجستي'],sym:'P(y=1|x) = σ(wᵀx+b)',label:'Logistic Regression'},
+{cat:'ML / AI',words:['linear regression','انحدار خطي'],sym:'y = wᵀx + b',label:'Linear Regression'},
+{cat:'ML / AI',words:['naive bayes','بايز الساذج'],sym:'NaiveBayes',label:'Naive Bayes'},
+{cat:'ML / AI',words:['k means','كاي ميانز','التجميع بالمتوسطات'],sym:'K-Means',label:'K-Means'},
+{cat:'ML / AI',words:['DBSCAN','دي بي سكان'],sym:'DBSCAN',label:'DBSCAN'},
+{cat:'ML / AI',words:['hierarchical clustering','تجميع هرمي'],sym:'HierClust',label:'Hierarchical Clustering'},
+{cat:'ML / AI',words:['information gain','مكسب المعلومات'],sym:'IG = H(S) - Σ(|Sᵥ|/|S|)H(Sᵥ)',label:'Information Gain'},
+{cat:'ML / AI',words:['entropy','الإنتروبيا'],sym:'H(X) = -Σ p(x)log₂p(x)',label:'Entropy'},
+{cat:'ML / AI',words:['gini impurity','معامل جيني'],sym:'Gini = 1 - Σpᵢ²',label:'Gini Impurity'},
+{cat:'ML / AI',words:['attention mechanism','آلية الانتباه'],sym:'Attention(Q,K,V) = softmax(QKᵀ/√dₖ)V',label:'Attention'},
+{cat:'ML / AI',words:['transformer','ترانسفورمر'],sym:'Transformer',label:'Transformer'},
+{cat:'ML / AI',words:['LSTM','long short term memory'],sym:'LSTM',label:'LSTM'},
+{cat:'ML / AI',words:['GRU','gated recurrent unit'],sym:'GRU',label:'GRU'},
+{cat:'ML / AI',words:['CNN','convolutional neural network'],sym:'CNN',label:'CNN'},
+{cat:'ML / AI',words:['RNN','recurrent neural network'],sym:'RNN',label:'RNN'},
+{cat:'ML / AI',words:['convolution','الالتفاف'],sym:'(f*g)(t) = ∫f(τ)g(t-τ)dτ',label:'Convolution'},
+{cat:'ML / AI',words:['embedding','تمثيل متجهي','إيمبيدنج'],sym:'Embedding',label:'Embedding'},
+
+/* ── PYTHON IMPORTS ─────────────────────────────────────────── */
+{cat:'Python',words:['import numpy','نمباي','نام باي'],sym:'import numpy as np',label:'import numpy as np'},
+{cat:'Python',words:['import pandas','باندا','باندز'],sym:'import pandas as pd',label:'import pandas as pd'},
+{cat:'Python',words:['import matplotlib','ماتبلوتليب'],sym:'import matplotlib.pyplot as plt',label:'import matplotlib.pyplot as plt'},
+{cat:'Python',words:['import seaborn','سيبورن'],sym:'import seaborn as sns',label:'import seaborn as sns'},
+{cat:'Python',words:['import sklearn','ساي كيت ليرن','سكايكت'],sym:'from sklearn',label:'from sklearn'},
+{cat:'Python',words:['import scipy','ساي باي'],sym:'import scipy.stats as stats',label:'import scipy.stats as stats'},
+{cat:'Python',words:['import tensorflow','تنسرفلو','تي إف'],sym:'import tensorflow as tf',label:'import tensorflow as tf'},
+{cat:'Python',words:['import keras','كيراس'],sym:'from tensorflow import keras',label:'from tensorflow import keras'},
+{cat:'Python',words:['import torch','تورش','بايتورش'],sym:'import torch\nimport torch.nn as nn',label:'import torch'},
+{cat:'Python',words:['import plotly','بلوتلي'],sym:'import plotly.express as px',label:'import plotly.express as px'},
+{cat:'Python',words:['import statsmodels','ستاتس موديلز'],sym:'import statsmodels.api as sm',label:'import statsmodels.api as sm'},
+{cat:'Python',words:['import warnings','وارنينجز','التحذيرات'],sym:'import warnings\nwarnings.filterwarnings("ignore")',label:'import warnings'},
+{cat:'Python',words:['import os','أو إس','مجلدات'],sym:'import os',label:'import os'},
+{cat:'Python',words:['import sys','سيس'],sym:'import sys',label:'import sys'},
+{cat:'Python',words:['import json','جيسون'],sym:'import json',label:'import json'},
+{cat:'Python',words:['import datetime','التاريخ'],sym:'from datetime import datetime',label:'from datetime import datetime'},
+{cat:'Python',words:['import re','ريجيكس','تعبيرات منتظمة'],sym:'import re',label:'import re'},
+{cat:'Python',words:['import random','راندوم','عشوائي'],sym:'import random',label:'import random'},
+{cat:'Python',words:['import copy','كوبي'],sym:'import copy',label:'import copy'},
+{cat:'Python',words:['import collections','كوليكشنز'],sym:'from collections import Counter, defaultdict',label:'from collections import Counter'},
+{cat:'Python',words:['import itertools','إيتر تولز'],sym:'import itertools',label:'import itertools'},
+{cat:'Python',words:['import functools','فانك تولز'],sym:'import functools',label:'import functools'},
+{cat:'Python',words:['import pickle','بيكل','حفظ النموذج'],sym:'import pickle',label:'import pickle'},
+{cat:'Python',words:['import joblib','جوب ليب'],sym:'import joblib',label:'import joblib'},
+
+/* ── NUMPY ─────────────────────────────────────────────────── */
+{cat:'NumPy',words:['numpy array','نب اراي','مصفوفة نمباي'],sym:'np.array([])',label:'np.array([])'},
+{cat:'NumPy',words:['numpy zeros','نب زيروز'],sym:'np.zeros((rows, cols))',label:'np.zeros()'},
+{cat:'NumPy',words:['numpy ones','نب ونز'],sym:'np.ones((rows, cols))',label:'np.ones()'},
+{cat:'NumPy',words:['numpy full','نب فول'],sym:'np.full((n,n), value)',label:'np.full()'},
+{cat:'NumPy',words:['numpy eye','نب آي','مصفوفة الهوية نمباي'],sym:'np.eye(n)',label:'np.eye(n)'},
+{cat:'NumPy',words:['numpy arange','نب إيرانج'],sym:'np.arange(start, stop, step)',label:'np.arange()'},
+{cat:'NumPy',words:['numpy linspace','نب لين سبيس'],sym:'np.linspace(start, stop, num)',label:'np.linspace()'},
+{cat:'NumPy',words:['numpy reshape','ريشيب'],sym:'.reshape(rows, cols)',label:'.reshape()'},
+{cat:'NumPy',words:['numpy flatten','فلاتن'],sym:'.flatten()',label:'.flatten()'},
+{cat:'NumPy',words:['numpy ravel','رافيل'],sym:'.ravel()',label:'.ravel()'},
+{cat:'NumPy',words:['numpy transpose','نب ترانسبوز'],sym:'.T',label:'.T المحوّل'},
+{cat:'NumPy',words:['numpy dot','نب دوت','الضرب النقطي نمباي'],sym:'np.dot(A, B)',label:'np.dot()'},
+{cat:'NumPy',words:['numpy matmul','ضرب المصفوفات'],sym:'np.matmul(A, B)',label:'np.matmul()'},
+{cat:'NumPy',words:['numpy mean','نب ميان','متوسط نمباي'],sym:'np.mean(arr, axis=0)',label:'np.mean()'},
+{cat:'NumPy',words:['numpy std','نب ستد','انحراف نمباي'],sym:'np.std(arr)',label:'np.std()'},
+{cat:'NumPy',words:['numpy var','نب فار','تباين نمباي'],sym:'np.var(arr)',label:'np.var()'},
+{cat:'NumPy',words:['numpy sum','نب سم','مجموع نمباي'],sym:'np.sum(arr, axis=0)',label:'np.sum()'},
+{cat:'NumPy',words:['numpy max','نب ماكس'],sym:'np.max(arr)',label:'np.max()'},
+{cat:'NumPy',words:['numpy min','نب مين'],sym:'np.min(arr)',label:'np.min()'},
+{cat:'NumPy',words:['numpy argmax','نب أرج ماكس'],sym:'np.argmax(arr)',label:'np.argmax()'},
+{cat:'NumPy',words:['numpy argmin','نب أرج مين'],sym:'np.argmin(arr)',label:'np.argmin()'},
+{cat:'NumPy',words:['numpy sort','نب سورت'],sym:'np.sort(arr)',label:'np.sort()'},
+{cat:'NumPy',words:['numpy argsort','نب أرج سورت'],sym:'np.argsort(arr)',label:'np.argsort()'},
+{cat:'NumPy',words:['numpy unique','نب يونيك'],sym:'np.unique(arr)',label:'np.unique()'},
+{cat:'NumPy',words:['numpy concatenate','نب كونكاتينيت'],sym:'np.concatenate([a, b], axis=0)',label:'np.concatenate()'},
+{cat:'NumPy',words:['numpy stack','نب ستاك'],sym:'np.stack([a, b], axis=0)',label:'np.stack()'},
+{cat:'NumPy',words:['numpy vstack','نب في ستاك'],sym:'np.vstack([a, b])',label:'np.vstack()'},
+{cat:'NumPy',words:['numpy hstack','نب إتش ستاك'],sym:'np.hstack([a, b])',label:'np.hstack()'},
+{cat:'NumPy',words:['numpy split','نب سبليت'],sym:'np.split(arr, indices)',label:'np.split()'},
+{cat:'NumPy',words:['numpy where','نب وير'],sym:'np.where(condition, x, y)',label:'np.where()'},
+{cat:'NumPy',words:['numpy clip','نب كليب'],sym:'np.clip(arr, min, max)',label:'np.clip()'},
+{cat:'NumPy',words:['numpy random','نب راندوم'],sym:'np.random.seed(42)',label:'np.random.seed()'},
+{cat:'NumPy',words:['numpy randn','نب راند ن'],sym:'np.random.randn(m, n)',label:'np.random.randn()'},
+{cat:'NumPy',words:['numpy randint','نب راند إنت'],sym:'np.random.randint(low, high, size)',label:'np.random.randint()'},
+{cat:'NumPy',words:['numpy linalg','لينالج'],sym:'np.linalg',label:'np.linalg'},
+{cat:'NumPy',words:['numpy linalg eig','ايجن فاليوز نمباي'],sym:'np.linalg.eig(A)',label:'np.linalg.eig()'},
+{cat:'NumPy',words:['numpy linalg inv','معكوس نمباي'],sym:'np.linalg.inv(A)',label:'np.linalg.inv()'},
+{cat:'NumPy',words:['numpy linalg norm','نورم نمباي'],sym:'np.linalg.norm(x)',label:'np.linalg.norm()'},
+{cat:'NumPy',words:['numpy linalg svd','SVD نمباي'],sym:'U, S, Vt = np.linalg.svd(A)',label:'np.linalg.svd()'},
+{cat:'NumPy',words:['numpy log','لوغاريتم نمباي'],sym:'np.log(arr)',label:'np.log()'},
+{cat:'NumPy',words:['numpy exp','الأس نمباي'],sym:'np.exp(arr)',label:'np.exp()'},
+{cat:'NumPy',words:['numpy sqrt','جذر نمباي'],sym:'np.sqrt(arr)',label:'np.sqrt()'},
+{cat:'NumPy',words:['numpy abs','قيمة مطلقة نمباي'],sym:'np.abs(arr)',label:'np.abs()'},
+{cat:'NumPy',words:['numpy shape','شيب'],sym:'.shape',label:'.shape'},
+{cat:'NumPy',words:['numpy dtype','دي تايب'],sym:'.dtype',label:'.dtype'},
+{cat:'NumPy',words:['numpy size','سايز نمباي'],sym:'.size',label:'.size'},
+{cat:'NumPy',words:['numpy ndim','عدد الأبعاد'],sym:'.ndim',label:'.ndim'},
+
+/* ── PANDAS ────────────────────────────────────────────────── */
+{cat:'Pandas',words:['dataframe','داتا فريم','قاعدة البيانات'],sym:'pd.DataFrame()',label:'pd.DataFrame()'},
+{cat:'Pandas',words:['read csv','ريد سي إس في'],sym:'df = pd.read_csv("file.csv")',label:'pd.read_csv()'},
+{cat:'Pandas',words:['read excel','ريد إكسيل'],sym:'df = pd.read_excel("file.xlsx")',label:'pd.read_excel()'},
+{cat:'Pandas',words:['read json','ريد جيسون'],sym:'df = pd.read_json("file.json")',label:'pd.read_json()'},
+{cat:'Pandas',words:['read sql','ريد إس كيو إل'],sym:'df = pd.read_sql(query, conn)',label:'pd.read_sql()'},
+{cat:'Pandas',words:['to csv','تو سي إس في','حفظ csv'],sym:'df.to_csv("file.csv", index=False)',label:'.to_csv()'},
+{cat:'Pandas',words:['head','الهيد','أول صفوف'],sym:'df.head(10)',label:'df.head()'},
+{cat:'Pandas',words:['tail','التيل','آخر صفوف'],sym:'df.tail(10)',label:'df.tail()'},
+{cat:'Pandas',words:['info','إنفو','معلومات الداتافريم'],sym:'df.info()',label:'df.info()'},
+{cat:'Pandas',words:['describe','ديسكرايب','إحصاء وصفي'],sym:'df.describe()',label:'df.describe()'},
+{cat:'Pandas',words:['shape pandas','شيب باندا'],sym:'df.shape',label:'df.shape'},
+{cat:'Pandas',words:['columns','الأعمدة'],sym:'df.columns.tolist()',label:'df.columns'},
+{cat:'Pandas',words:['index','الإندكس'],sym:'df.index',label:'df.index'},
+{cat:'Pandas',words:['dtypes','دي تايبس','أنواع البيانات'],sym:'df.dtypes',label:'df.dtypes'},
+{cat:'Pandas',words:['isnull sum','القيم المفقودة','ناقصة'],sym:'df.isnull().sum()',label:'df.isnull().sum()'},
+{cat:'Pandas',words:['dropna','دروب نا','حذف القيم المفقودة'],sym:'df.dropna(inplace=True)',label:'df.dropna()'},
+{cat:'Pandas',words:['fillna','فيل نا','ملء القيم المفقودة'],sym:'df.fillna(df.mean(), inplace=True)',label:'df.fillna()'},
+{cat:'Pandas',words:['value counts','فاليو كاونتس','عد القيم'],sym:'df["col"].value_counts()',label:'.value_counts()'},
+{cat:'Pandas',words:['nunique','عدد القيم الفريدة'],sym:'df["col"].nunique()',label:'.nunique()'},
+{cat:'Pandas',words:['unique','القيم الفريدة'],sym:'df["col"].unique()',label:'.unique()'},
+{cat:'Pandas',words:['loc','لوك','اختيار بالاسم'],sym:'df.loc[rows, cols]',label:'df.loc[]'},
+{cat:'Pandas',words:['iloc','إيلوك','اختيار بالرقم'],sym:'df.iloc[rows, cols]',label:'df.iloc[]'},
+{cat:'Pandas',words:['query','كويري','فلترة'],sym:'df.query("col > value")',label:'df.query()'},
+{cat:'Pandas',words:['filter','فلتر','تصفية'],sym:'df[df["col"] == value]',label:'Filtering'},
+{cat:'Pandas',words:['group by','جروب باي','تجميع'],sym:'df.groupby("col").agg()',label:'df.groupby()'},
+{cat:'Pandas',words:['agg','أجريجيت','دوال التجميع'],sym:'.agg({"col": ["mean","sum","count"]})',label:'.agg()'},
+{cat:'Pandas',words:['pivot table','بيفوت تيبل','جدول محوري'],sym:'pd.pivot_table(df, values, index, columns)',label:'pd.pivot_table()'},
+{cat:'Pandas',words:['merge','ميرج','دمج'],sym:'pd.merge(df1, df2, on="col", how="inner")',label:'pd.merge()'},
+{cat:'Pandas',words:['concat','كونكات','ربط'],sym:'pd.concat([df1, df2], axis=0)',label:'pd.concat()'},
+{cat:'Pandas',words:['join','جوين'],sym:'df1.join(df2, on="col")',label:'df.join()'},
+{cat:'Pandas',words:['apply','ابلاي','تطبيق دالة'],sym:'df["col"].apply(lambda x: x*2)',label:'.apply()'},
+{cat:'Pandas',words:['map','ماب','تحويل قيم'],sym:'df["col"].map(dict)',label:'.map()'},
+{cat:'Pandas',words:['sort values','سورت فاليوز','ترتيب'],sym:'df.sort_values("col", ascending=False)',label:'df.sort_values()'},
+{cat:'Pandas',words:['sort index','ترتيب الإندكس'],sym:'df.sort_index()',label:'df.sort_index()'},
+{cat:'Pandas',words:['reset index','ريست إندكس'],sym:'df.reset_index(drop=True)',label:'df.reset_index()'},
+{cat:'Pandas',words:['set index','سيت إندكس'],sym:'df.set_index("col")',label:'df.set_index()'},
+{cat:'Pandas',words:['rename','رينيم','إعادة تسمية'],sym:'df.rename(columns={"old":"new"})',label:'df.rename()'},
+{cat:'Pandas',words:['drop column','دروب','حذف عمود'],sym:'df.drop("col", axis=1)',label:'df.drop()'},
+{cat:'Pandas',words:['astype','اس تايب','تحويل نوع البيانات'],sym:'df["col"].astype(int)',label:'.astype()'},
+{cat:'Pandas',words:['str operations','عمليات النصوص'],sym:'df["col"].str.lower()',label:'.str.lower()'},
+{cat:'Pandas',words:['datetime','تحويل التاريخ'],sym:'pd.to_datetime(df["date"])',label:'pd.to_datetime()'},
+{cat:'Pandas',words:['sample','عينة عشوائية'],sym:'df.sample(n=100, random_state=42)',label:'df.sample()'},
+{cat:'Pandas',words:['duplicated','المكررة'],sym:'df.duplicated().sum()',label:'df.duplicated()'},
+{cat:'Pandas',words:['drop duplicates','حذف المكررات'],sym:'df.drop_duplicates(inplace=True)',label:'df.drop_duplicates()'},
+{cat:'Pandas',words:['cut','تقسيم إلى فئات','كات'],sym:'pd.cut(df["col"], bins=5)',label:'pd.cut()'},
+{cat:'Pandas',words:['get dummies','جيت داميز','ترميز الفئات'],sym:'pd.get_dummies(df["col"])',label:'pd.get_dummies()'},
+{cat:'Pandas',words:['corr','الارتباط بين الأعمدة'],sym:'df.corr()',label:'df.corr()'},
+{cat:'Pandas',words:['crosstab','كروس تاب','جدول تقاطعي'],sym:'pd.crosstab(df["col1"], df["col2"])',label:'pd.crosstab()'},
+{cat:'Pandas',words:['melt','ميلت','إعادة تشكيل'],sym:'df.melt(id_vars=["col"])',label:'df.melt()'},
+{cat:'Pandas',words:['stack','ستاك باندا'],sym:'df.stack()',label:'df.stack()'},
+{cat:'Pandas',words:['unstack','أنستاك'],sym:'df.unstack()',label:'df.unstack()'},
+
+/* ── SKLEARN ─────────────────────────────────────────────── */
+{cat:'Sklearn',words:['train test split','تقسيم البيانات'],sym:'from sklearn.model_selection import train_test_split\nX_train,X_test,y_train,y_test = train_test_split(X,y,test_size=0.2,random_state=42)',label:'train_test_split'},
+{cat:'Sklearn',words:['standard scaler','ستاندرد سكيلر','توحيد البيانات'],sym:'from sklearn.preprocessing import StandardScaler\nscaler = StandardScaler()\nX_train = scaler.fit_transform(X_train)',label:'StandardScaler'},
+{cat:'Sklearn',words:['min max scaler','تطبيع البيانات'],sym:'from sklearn.preprocessing import MinMaxScaler\nscaler = MinMaxScaler()\nX = scaler.fit_transform(X)',label:'MinMaxScaler'},
+{cat:'Sklearn',words:['label encoder','ترميز التصنيفات'],sym:'from sklearn.preprocessing import LabelEncoder\nle = LabelEncoder()\ny = le.fit_transform(y)',label:'LabelEncoder'},
+{cat:'Sklearn',words:['one hot encoder','ترميز ثنائي'],sym:'from sklearn.preprocessing import OneHotEncoder',label:'OneHotEncoder'},
+{cat:'Sklearn',words:['sklearn linear regression','انحدار خطي سكايكت'],sym:'from sklearn.linear_model import LinearRegression\nmodel = LinearRegression()\nmodel.fit(X_train, y_train)',label:'LinearRegression'},
+{cat:'Sklearn',words:['sklearn logistic regression','انحدار لوجستي سكايكت'],sym:'from sklearn.linear_model import LogisticRegression\nmodel = LogisticRegression()\nmodel.fit(X_train, y_train)',label:'LogisticRegression'},
+{cat:'Sklearn',words:['sklearn random forest','غابة عشوائية سكايكت'],sym:'from sklearn.ensemble import RandomForestClassifier\nmodel = RandomForestClassifier(n_estimators=100, random_state=42)',label:'RandomForestClassifier'},
+{cat:'Sklearn',words:['sklearn KNN','كي إن إن سكايكت'],sym:'from sklearn.neighbors import KNeighborsClassifier\nmodel = KNeighborsClassifier(n_neighbors=5)',label:'KNeighborsClassifier'},
+{cat:'Sklearn',words:['sklearn SVM','إس في إم سكايكت'],sym:'from sklearn.svm import SVC\nmodel = SVC(kernel="rbf")',label:'SVC'},
+{cat:'Sklearn',words:['sklearn XGBoost','إكس جي بوست سكايكت'],sym:'from xgboost import XGBClassifier\nmodel = XGBClassifier()',label:'XGBClassifier'},
+{cat:'Sklearn',words:['cross val score','كروس فال سكور'],sym:'from sklearn.model_selection import cross_val_score\nscores = cross_val_score(model, X, y, cv=5)',label:'cross_val_score'},
+{cat:'Sklearn',words:['grid search','جريد سيرش','ضبط المعاملات'],sym:'from sklearn.model_selection import GridSearchCV\ngrid = GridSearchCV(model, param_grid, cv=5)',label:'GridSearchCV'},
+{cat:'Sklearn',words:['pipeline','بايبلاين'],sym:'from sklearn.pipeline import Pipeline\npipe = Pipeline([("scaler", StandardScaler()), ("model", model)])',label:'Pipeline'},
+{cat:'Sklearn',words:['accuracy score','دقة النموذج'],sym:'from sklearn.metrics import accuracy_score\naccuracy_score(y_test, y_pred)',label:'accuracy_score'},
+{cat:'Sklearn',words:['classification report','تقرير التصنيف'],sym:'from sklearn.metrics import classification_report\nprint(classification_report(y_test, y_pred))',label:'classification_report'},
+{cat:'Sklearn',words:['confusion matrix sklearn','مصفوفة الارتباك سكايكت'],sym:'from sklearn.metrics import confusion_matrix\ncm = confusion_matrix(y_test, y_pred)',label:'confusion_matrix'},
+{cat:'Sklearn',words:['r2 score','معامل التحديد سكايكت'],sym:'from sklearn.metrics import r2_score\nr2_score(y_test, y_pred)',label:'r2_score'},
+{cat:'Sklearn',words:['mean squared error sklearn','MSE سكايكت'],sym:'from sklearn.metrics import mean_squared_error\nmse = mean_squared_error(y_test, y_pred)',label:'mean_squared_error'},
+{cat:'Sklearn',words:['feature importance','أهمية المتغيرات'],sym:'model.feature_importances_',label:'feature_importances_'},
+{cat:'Sklearn',words:['PCA sklearn','تخفيض الأبعاد'],sym:'from sklearn.decomposition import PCA\npca = PCA(n_components=2)\nX_pca = pca.fit_transform(X)',label:'PCA sklearn'},
+{cat:'Sklearn',words:['sklearn predict','تنبؤ نموذج'],sym:'y_pred = model.predict(X_test)',label:'model.predict()'},
+{cat:'Sklearn',words:['predict proba','احتمالات التنبؤ'],sym:'y_prob = model.predict_proba(X_test)',label:'model.predict_proba()'},
+{cat:'Sklearn',words:['fit model','تدريب النموذج'],sym:'model.fit(X_train, y_train)',label:'model.fit()'},
+{cat:'Sklearn',words:['score model','تقييم النموذج'],sym:'model.score(X_test, y_test)',label:'model.score()'},
+
+/* ── PYTHON SYNTAX ──────────────────────────────────────────── */
+{cat:'Python Syntax',words:['print','برينت','اطبع'],sym:'print()',label:'print()'},
+{cat:'Python Syntax',words:['for loop','فور لوب','حلقة تكرار'],sym:'for i in range(n):\n    ',label:'for loop'},
+{cat:'Python Syntax',words:['for enumerate','فور إنيوميريت'],sym:'for i, val in enumerate(lst):\n    ',label:'for enumerate'},
+{cat:'Python Syntax',words:['for zip','فور زيب'],sym:'for a, b in zip(lst1, lst2):\n    ',label:'for zip'},
+{cat:'Python Syntax',words:['while loop','وايل لوب','حلقة while'],sym:'while condition:\n    ',label:'while loop'},
+{cat:'Python Syntax',words:['if statement','إف','شرط'],sym:'if condition:\n    ',label:'if statement'},
+{cat:'Python Syntax',words:['if else','إف إلس'],sym:'if condition:\n    \nelse:\n    ',label:'if/else'},
+{cat:'Python Syntax',words:['if elif else','إف إيليف'],sym:'if cond1:\n    \nelif cond2:\n    \nelse:\n    ',label:'if/elif/else'},
+{cat:'Python Syntax',words:['def function','ديف فانكشن','تعريف دالة'],sym:'def function_name(params):\n    """Docstring"""\n    return result',label:'def function'},
+{cat:'Python Syntax',words:['lambda function','لامبدا','دالة مجهولة'],sym:'f = lambda x: x**2',label:'lambda'},
+{cat:'Python Syntax',words:['list comprehension','ليست كومبريهينشن'],sym:'result = [f(x) for x in lst if condition]',label:'List Comprehension'},
+{cat:'Python Syntax',words:['dict comprehension','ديكت كومبريهينشن'],sym:'d = {k: v for k, v in items.items()}',label:'Dict Comprehension'},
+{cat:'Python Syntax',words:['class definition','كلاس','تعريف كلاس'],sym:'class MyClass:\n    def __init__(self):\n        pass',label:'class'},
+{cat:'Python Syntax',words:['try except','تراي إكسبت','معالجة الأخطاء'],sym:'try:\n    \nexcept Exception as e:\n    print(e)',label:'try/except'},
+{cat:'Python Syntax',words:['with open','ويث أوبن','فتح ملف'],sym:'with open("file.txt", "r") as f:\n    data = f.read()',label:'with open()'},
+{cat:'Python Syntax',words:['f string','إف سترينج'],sym:'f"Value is {variable:.2f}"',label:'f-string'},
+{cat:'Python Syntax',words:['list','ليست','قائمة'],sym:'lst = []',label:'list = []'},
+{cat:'Python Syntax',words:['dictionary','ديكشناري','قاموس'],sym:'d = {}',label:'dict = {}'},
+{cat:'Python Syntax',words:['tuple','تابل'],sym:'t = ()',label:'tuple = ()'},
+{cat:'Python Syntax',words:['set','ست','مجموعة بايثون'],sym:'s = set()',label:'set = set()'},
+{cat:'Python Syntax',words:['append','ابند','إضافة لقائمة'],sym:'.append(item)',label:'.append()'},
+{cat:'Python Syntax',words:['extend','إكستند'],sym:'.extend(other_lst)',label:'.extend()'},
+{cat:'Python Syntax',words:['insert','إنسيرت'],sym:'.insert(index, item)',label:'.insert()'},
+{cat:'Python Syntax',words:['remove','ريموف','حذف من قائمة'],sym:'.remove(item)',label:'.remove()'},
+{cat:'Python Syntax',words:['pop','بوب'],sym:'.pop(index)',label:'.pop()'},
+{cat:'Python Syntax',words:['zip','زيب','دمج قوائم'],sym:'zip(list1, list2)',label:'zip()'},
+{cat:'Python Syntax',words:['map','ماب بايثون'],sym:'list(map(func, lst))',label:'map()'},
+{cat:'Python Syntax',words:['filter','فيلتر بايثون'],sym:'list(filter(lambda x: x>0, lst))',label:'filter()'},
+{cat:'Python Syntax',words:['sorted','سورتد','ترتيب قائمة'],sym:'sorted(lst, key=lambda x: x, reverse=True)',label:'sorted()'},
+{cat:'Python Syntax',words:['enumerate','إنيوميريت'],sym:'list(enumerate(lst))',label:'enumerate()'},
+{cat:'Python Syntax',words:['isinstance','إيز إنستانس','فحص النوع'],sym:'isinstance(obj, type)',label:'isinstance()'},
+{cat:'Python Syntax',words:['type','نوع المتغير'],sym:'type(variable)',label:'type()'},
+{cat:'Python Syntax',words:['len','لين','طول'],sym:'len(lst)',label:'len()'},
+{cat:'Python Syntax',words:['range','رينج'],sym:'range(start, stop, step)',label:'range()'},
+{cat:'Python Syntax',words:['round','راوند','تقريب'],sym:'round(num, 2)',label:'round()'},
+{cat:'Python Syntax',words:['format','فورمات'],sym:'"{:.4f}".format(num)',label:'.format()'},
+{cat:'Python Syntax',words:['assert','أسيرت','فحص'],sym:'assert condition, "Error message"',label:'assert'},
+{cat:'Python Syntax',words:['pass','باس'],sym:'pass',label:'pass'},
+{cat:'Python Syntax',words:['break','بريك','كسر الحلقة'],sym:'break',label:'break'},
+{cat:'Python Syntax',words:['continue','كونتينيو','تخطي'],sym:'continue',label:'continue'},
+{cat:'Python Syntax',words:['return','ريترن','إرجاع'],sym:'return value',label:'return'},
+{cat:'Python Syntax',words:['yield','يييلد','مولد'],sym:'yield value',label:'yield'},
+{cat:'Python Syntax',words:['global variable','متغير عام','جلوبال'],sym:'global var_name',label:'global'},
+{cat:'Python Syntax',words:['decorator','ديكوريتور'],sym:'@decorator\ndef func():',label:'@decorator'},
+
+/* ── VISUALIZATION ───────────────────────────────────────── */
+{cat:'تصوير بياني',words:['figure subplot','فيجر','شبكة مخططات'],sym:'fig, ax = plt.subplots(nrows, ncols, figsize=(12,6))',label:'plt.subplots()'},
+{cat:'تصوير بياني',words:['scatter plot','سكاتر','نقاط مبعثرة'],sym:'plt.scatter(x, y, c="blue", alpha=0.5, label="data")',label:'plt.scatter()'},
+{cat:'تصوير بياني',words:['line plot','لاين بلوت','خط بياني'],sym:'plt.plot(x, y, color="red", linewidth=2, label="line")',label:'plt.plot()'},
+{cat:'تصوير بياني',words:['histogram','هيستوجرام','توزيع البيانات'],sym:'plt.hist(data, bins=30, edgecolor="black", alpha=0.7)',label:'plt.hist()'},
+{cat:'تصوير بياني',words:['boxplot','بوكس بلوت','صندوق المدى'],sym:'plt.boxplot(data)\n# or\nsns.boxplot(x="col", y="col2", data=df)',label:'boxplot()'},
+{cat:'تصوير بياني',words:['bar plot','بار بلوت','أعمدة'],sym:'plt.bar(x, height, color="steelblue", edgecolor="black")',label:'plt.bar()'},
+{cat:'تصوير بياني',words:['pie chart','باي تشارت','دائرة'],sym:'plt.pie(sizes, labels=labels, autopct="%1.1f%%")',label:'plt.pie()'},
+{cat:'تصوير بياني',words:['heatmap','هيت ماب','خريطة حرارية'],sym:'sns.heatmap(df.corr(), annot=True, cmap="coolwarm", fmt=".2f")',label:'sns.heatmap()'},
+{cat:'تصوير بياني',words:['pairplot','بير بلوت'],sym:'sns.pairplot(df, hue="target")',label:'sns.pairplot()'},
+{cat:'تصوير بياني',words:['distribution plot','توزيع سيبورن'],sym:'sns.histplot(df["col"], kde=True)',label:'sns.histplot()'},
+{cat:'تصوير بياني',words:['violin plot','فايولن بلوت'],sym:'sns.violinplot(x="col", y="col2", data=df)',label:'sns.violinplot()'},
+{cat:'تصوير بياني',words:['title','عنوان المخطط'],sym:'plt.title("Title", fontsize=14)',label:'plt.title()'},
+{cat:'تصوير بياني',words:['xlabel','تسمية المحور X'],sym:'plt.xlabel("X Axis")',label:'plt.xlabel()'},
+{cat:'تصوير بياني',words:['ylabel','تسمية المحور Y'],sym:'plt.ylabel("Y Axis")',label:'plt.ylabel()'},
+{cat:'تصوير بياني',words:['legend','الأسطورة','مفتاح الرسم'],sym:'plt.legend(loc="best")',label:'plt.legend()'},
+{cat:'تصوير بياني',words:['grid','شبكة الرسم'],sym:'plt.grid(True, alpha=0.3)',label:'plt.grid()'},
+{cat:'تصوير بياني',words:['show','إظهار الرسم'],sym:'plt.tight_layout()\nplt.show()',label:'plt.show()'},
+{cat:'تصوير بياني',words:['save figure','حفظ الرسم'],sym:'plt.savefig("plot.png", dpi=300, bbox_inches="tight")',label:'plt.savefig()'},
+{cat:'تصوير بياني',words:['plotly scatter','سكاتر بلوتلي'],sym:'fig = px.scatter(df, x="col1", y="col2", color="target")\nfig.show()',label:'px.scatter()'},
+
+/* ── SQL ─────────────────────────────────────────────────────── */
+{cat:'SQL',words:['select','سيليكت','اختيار'],sym:'SELECT * FROM table_name;',label:'SELECT'},
+{cat:'SQL',words:['select columns','سيليكت أعمدة'],sym:'SELECT col1, col2 FROM table;',label:'SELECT cols'},
+{cat:'SQL',words:['where','وير','شرط sql'],sym:'WHERE condition;',label:'WHERE'},
+{cat:'SQL',words:['and sql','و sql'],sym:'WHERE col1 = val AND col2 = val;',label:'WHERE AND'},
+{cat:'SQL',words:['or sql','أو sql'],sym:'WHERE col1 = val OR col2 = val;',label:'WHERE OR'},
+{cat:'SQL',words:['inner join','إنر جوين','تقاطع جداول'],sym:'INNER JOIN table2 ON t1.id = t2.id',label:'INNER JOIN'},
+{cat:'SQL',words:['left join','ليفت جوين'],sym:'LEFT JOIN table2 ON t1.id = t2.id',label:'LEFT JOIN'},
+{cat:'SQL',words:['right join','رايت جوين'],sym:'RIGHT JOIN table2 ON t1.id = t2.id',label:'RIGHT JOIN'},
+{cat:'SQL',words:['full outer join','فول أوتر جوين'],sym:'FULL OUTER JOIN table2 ON t1.id = t2.id',label:'FULL OUTER JOIN'},
+{cat:'SQL',words:['group by sql','جروب باي sql'],sym:'GROUP BY col1, col2',label:'GROUP BY'},
+{cat:'SQL',words:['having','هافينج'],sym:'HAVING COUNT(*) > 1',label:'HAVING'},
+{cat:'SQL',words:['order by','أوردر باي'],sym:'ORDER BY col DESC',label:'ORDER BY'},
+{cat:'SQL',words:['limit','ليميت sql'],sym:'LIMIT 100',label:'LIMIT'},
+{cat:'SQL',words:['count sql','كاونت','عد صفوف'],sym:'SELECT COUNT(*) FROM table;',label:'COUNT(*)'},
+{cat:'SQL',words:['sum sql','سم sql','مجموع sql'],sym:'SELECT SUM(col) FROM table;',label:'SUM()'},
+{cat:'SQL',words:['avg sql','أفريدج','متوسط sql'],sym:'SELECT AVG(col) FROM table;',label:'AVG()'},
+{cat:'SQL',words:['max sql','ماكس sql'],sym:'SELECT MAX(col) FROM table;',label:'MAX()'},
+{cat:'SQL',words:['min sql','مين sql'],sym:'SELECT MIN(col) FROM table;',label:'MIN()'},
+{cat:'SQL',words:['distinct','ديستينكت','قيم فريدة sql'],sym:'SELECT DISTINCT col FROM table;',label:'DISTINCT'},
+{cat:'SQL',words:['like sql','لايك','بحث نص'],sym:"WHERE col LIKE '%pattern%'",label:'LIKE'},
+{cat:'SQL',words:['in sql','إن sql'],sym:'WHERE col IN (val1, val2, val3)',label:'IN'},
+{cat:'SQL',words:['between','بيتوين','بين قيمتين'],sym:'WHERE col BETWEEN val1 AND val2',label:'BETWEEN'},
+{cat:'SQL',words:['is null sql','نال sql'],sym:'WHERE col IS NULL',label:'IS NULL'},
+{cat:'SQL',words:['is not null','مش نال'],sym:'WHERE col IS NOT NULL',label:'IS NOT NULL'},
+{cat:'SQL',words:['subquery','سابكويري','استعلام فرعي'],sym:'SELECT * FROM (SELECT ...) AS sub',label:'Subquery'},
+{cat:'SQL',words:['case when','كيس وين','شرط sql'],sym:'CASE WHEN cond THEN val1 ELSE val2 END',label:'CASE WHEN'},
+{cat:'SQL',words:['window function','وندو فانكشن','دالة نافذة'],sym:'ROW_NUMBER() OVER (PARTITION BY col ORDER BY col2)',label:'Window Function'},
+{cat:'SQL',words:['rank sql','رانك sql'],sym:'RANK() OVER (ORDER BY col DESC)',label:'RANK()'},
+{cat:'SQL',words:['lag sql','لاج'],sym:'LAG(col, 1) OVER (ORDER BY date)',label:'LAG()'},
+{cat:'SQL',words:['lead sql','ليد'],sym:'LEAD(col, 1) OVER (ORDER BY date)',label:'LEAD()'},
+{cat:'SQL',words:['cte','ويذ as','common table expression'],sym:'WITH cte AS (\n  SELECT ...\n)\nSELECT * FROM cte;',label:'CTE WITH'},
+{cat:'SQL',words:['create table','كريت تيبل'],sym:"CREATE TABLE name (\n  id INT PRIMARY KEY,\n  col VARCHAR(255)\n);",label:'CREATE TABLE'},
+{cat:'SQL',words:['insert into','إنسيرت'],sym:'INSERT INTO table (col1, col2) VALUES (val1, val2);',label:'INSERT INTO'},
+{cat:'SQL',words:['update sql','أبديت'],sym:'UPDATE table SET col = val WHERE condition;',label:'UPDATE'},
+{cat:'SQL',words:['delete sql','ديليت'],sym:'DELETE FROM table WHERE condition;',label:'DELETE'},
+{cat:'SQL',words:['create index','إندكس sql'],sym:'CREATE INDEX idx ON table(col);',label:'CREATE INDEX'},
+
+/* ── SCIPY ─────────────────────────────────────────────────── */
+{cat:'Scipy',words:['scipy ttest ind','تي تست مستقل'],sym:'from scipy import stats\nt_stat, p_val = stats.ttest_ind(group1, group2)',label:'ttest_ind'},
+{cat:'Scipy',words:['scipy ttest rel','تي تست مرتبط'],sym:'t_stat, p_val = stats.ttest_rel(before, after)',label:'ttest_rel'},
+{cat:'Scipy',words:['scipy ttest 1samp','تي تست عينة واحدة'],sym:'t_stat, p_val = stats.ttest_1samp(data, popmean)',label:'ttest_1samp'},
+{cat:'Scipy',words:['scipy chi2','مربع كاي ساي باي'],sym:'chi2, p, dof, expected = stats.chi2_contingency(table)',label:'chi2_contingency'},
+{cat:'Scipy',words:['scipy anova','أنوفا ساي باي'],sym:'f_stat, p_val = stats.f_oneway(g1, g2, g3)',label:'f_oneway'},
+{cat:'Scipy',words:['scipy pearsonr','بيرسون ساي باي'],sym:'r, p_val = stats.pearsonr(x, y)',label:'pearsonr'},
+{cat:'Scipy',words:['scipy spearmanr','سبيرمان ساي باي'],sym:'r, p_val = stats.spearmanr(x, y)',label:'spearmanr'},
+{cat:'Scipy',words:['scipy norm pdf','التوزيع الطبيعي ساي باي'],sym:'from scipy.stats import norm\nnorm.pdf(x, loc=mu, scale=sigma)',label:'norm.pdf()'},
+{cat:'Scipy',words:['scipy norm cdf','دالة التراكم الطبيعي'],sym:'norm.cdf(x, loc=mu, scale=sigma)',label:'norm.cdf()'},
+{cat:'Scipy',words:['scipy norm ppf','القيمة المقابلة للاحتمال'],sym:'norm.ppf(0.95, loc=0, scale=1)',label:'norm.ppf()'},
+{cat:'Scipy',words:['scipy binomial','ثنائي الحد ساي باي'],sym:'from scipy.stats import binom\nbinom.pmf(k, n, p)',label:'binom.pmf()'},
+{cat:'Scipy',words:['scipy poisson','بواسون ساي باي'],sym:'from scipy.stats import poisson\npoisson.pmf(k, mu)',label:'poisson.pmf()'},
+{cat:'Scipy',words:['scipy optimize','تحسين ساي باي'],sym:'from scipy.optimize import minimize\nresult = minimize(func, x0, method="BFGS")',label:'minimize()'},
+{cat:'Scipy',words:['scipy interpolate','استيفاء'],sym:'from scipy.interpolate import interp1d\nf = interp1d(x, y, kind="cubic")',label:'interp1d()'},
+{cat:'Scipy',words:['scipy fft','تحويل فورييه ساي باي'],sym:'from scipy.fft import fft, fftfreq\nY = fft(y)',label:'fft()'},
+{cat:'Scipy',words:['scipy distance','مسافة'],sym:'from scipy.spatial.distance import euclidean, cosine\neuclidean(a, b)',label:'scipy.distance'},
+{cat:'Scipy',words:['scipy mannwhitney','مان ويتني'],sym:'u_stat, p_val = stats.mannwhitneyu(x, y)',label:'mannwhitneyu'},
+{cat:'Scipy',words:['scipy shapiro','شابيرو','اختبار الطبيعية'],sym:'stat, p_val = stats.shapiro(data)',label:'shapiro()'},
+{cat:'Scipy',words:['scipy levene','ليفين','اختبار التجانس'],sym:'stat, p_val = stats.levene(g1, g2)',label:'levene()'},
+{cat:'Scipy',words:['scipy kruskal','كروسكال واليس'],sym:'stat, p_val = stats.kruskal(g1, g2, g3)',label:'kruskal()'},
+
+/* ── TIME SERIES ───────────────────────────────────────────── */
+{cat:'سلاسل زمنية',words:['ARIMA','أريما'],sym:'ARIMA(p,d,q)',label:'ARIMA(p,d,q)'},
+{cat:'سلاسل زمنية',words:['SARIMA','ساريما'],sym:'SARIMA(p,d,q)(P,D,Q,s)',label:'SARIMA'},
+{cat:'سلاسل زمنية',words:['ACF','دالة الارتباط الذاتي'],sym:'ACF',label:'ACF دالة الارتباط الذاتي'},
+{cat:'سلاسل زمنية',words:['PACF','الارتباط الذاتي الجزئي'],sym:'PACF',label:'PACF'},
+{cat:'سلاسل زمنية',words:['stationarity','الثبات','السكونية'],sym:'Stationarity',label:'Stationarity الثبات'},
+{cat:'سلاسل زمنية',words:['ADF test','اختبار ديكي فولر','أي دي إف'],sym:'ADF Test',label:'ADF Test'},
+{cat:'سلاسل زمنية',words:['differencing','الفروق الأولى'],sym:'Δyₜ = yₜ - yₜ₋₁',label:'Differencing'},
+{cat:'سلاسل زمنية',words:['lag operator','مؤثر التأخير'],sym:'L·yₜ = yₜ₋₁',label:'Lag Operator L'},
+{cat:'سلاسل زمنية',words:['moving average','المتوسط المتحرك'],sym:'MA(q)',label:'MA(q) متوسط متحرك'},
+{cat:'سلاسل زمنية',words:['autoregression','الانحدار الذاتي'],sym:'AR(p)',label:'AR(p) انحدار ذاتي'},
+{cat:'سلاسل زمنية',words:['seasonality','الموسمية'],sym:'Seasonality',label:'Seasonality الموسمية'},
+{cat:'سلاسل زمنية',words:['trend','الاتجاه'],sym:'Trend',label:'Trend الاتجاه'},
+{cat:'سلاسل زمنية',words:['GARCH','جارش'],sym:'GARCH(p,q)',label:'GARCH'},
+{cat:'سلاسل زمنية',words:['exponential smoothing','التمهيد الأسي'],sym:'Sₜ = αyₜ + (1-α)Sₜ₋₁',label:'Exponential Smoothing'},
+{cat:'سلاسل زمنية',words:['rolling mean','المتوسط المتحرك باندا'],sym:'df["col"].rolling(window=7).mean()',label:'rolling().mean()'},
+{cat:'سلاسل زمنية',words:['rolling std','الانحراف المتحرك'],sym:'df["col"].rolling(window=7).std()',label:'rolling().std()'},
+{cat:'سلاسل زمنية',words:['resample','إعادة أخذ العينات'],sym:'df.resample("M").mean()',label:'resample()'},
+{cat:'سلاسل زمنية',words:['prophet','فيسبوك بروفيت'],sym:'from prophet import Prophet\nm = Prophet()\nm.fit(df)',label:'Prophet'},
+{cat:'سلاسل زمنية',words:['LSTM time series','LSTM سلسلة زمنية'],sym:'LSTM(units=50, return_sequences=True)',label:'LSTM for TS'},
+
+/* ── BAYESIAN ──────────────────────────────────────────────── */
+{cat:'Bayesian',words:['prior','البريور','التوزيع القبلي'],sym:'P(θ)',label:'P(θ) Prior'},
+{cat:'Bayesian',words:['likelihood','اللايكليهود','الاحتمالية'],sym:'P(X|θ)',label:'P(X|θ) Likelihood'},
+{cat:'Bayesian',words:['posterior','البوستيريور','التوزيع البعدي'],sym:'P(θ|X)',label:'P(θ|X) Posterior'},
+{cat:'Bayesian',words:['bayes rule','قانون بايز'],sym:'P(θ|X) ∝ P(X|θ)·P(θ)',label:'Bayes Rule'},
+{cat:'Bayesian',words:['MAP','maximum a posteriori','أعظم التقدير البعدي'],sym:'θ_MAP = argmax P(θ|X)',label:'MAP'},
+{cat:'Bayesian',words:['MCMC','ماركوف'],sym:'MCMC',label:'MCMC'},
+{cat:'Bayesian',words:['KL divergence','كل ديفيريدجنس','التباعد'],sym:'KL(P‖Q) = Σ P(x)log(P(x)/Q(x))',label:'KL Divergence'},
+{cat:'Bayesian',words:['entropy information','إنتروبيا المعلومات'],sym:'H(X) = -Σ p(x)log₂p(x)',label:'Entropy H(X)'},
+{cat:'Bayesian',words:['mutual information','المعلومات المشتركة'],sym:'I(X;Y) = H(X) - H(X|Y)',label:'Mutual Information'},
+{cat:'Bayesian',words:['joint probability','الاحتمال المشترك'],sym:'P(A∩B) = P(A)·P(B|A)',label:'P(A∩B) مشترك'},
+{cat:'Bayesian',words:['marginal probability','الاحتمال الهامشي'],sym:'P(A) = Σ P(A,B)',label:'P(A) هامشي'},
+{cat:'Bayesian',words:['conjugate prior','البريور المقترن'],sym:'Conjugate Prior',label:'Conjugate Prior'},
+{cat:'Bayesian',words:['credible interval','فترة المصداقية'],sym:'95% Credible Interval',label:'Credible Interval'},
+{cat:'Bayesian',words:['beta distribution','توزيع بيتا'],sym:'Beta(α,β)',label:'Beta(α,β)'},
+{cat:'Bayesian',words:['dirichlet distribution','توزيع ديريكليت'],sym:'Dir(α)',label:'Dirichlet(α)'},
+{cat:'Bayesian',words:['variational inference','الاستدلال التغايري'],sym:'VI: q(θ) ≈ p(θ|X)',label:'Variational Inference'},
+
+/* ── INFORMATION THEORY ────────────────────────────────────── */
+{cat:'نظرية المعلومات',words:['information content','محتوى المعلومات'],sym:'I(x) = -log₂P(x)',label:'I(x) محتوى المعلومات'},
+{cat:'نظرية المعلومات',words:['joint entropy','الإنتروبيا المشتركة'],sym:'H(X,Y) = -ΣΣ p(x,y)log p(x,y)',label:'H(X,Y) مشتركة'},
+{cat:'نظرية المعلومات',words:['conditional entropy','الإنتروبيا الشرطية'],sym:'H(X|Y) = H(X,Y) - H(Y)',label:'H(X|Y) شرطية'},
+{cat:'نظرية المعلومات',words:['cross entropy','الإنتروبيا التقاطعية'],sym:'H(P,Q) = -Σ P(x)log Q(x)',label:'Cross Entropy'},
+{cat:'نظرية المعلومات',words:['channel capacity','سعة القناة'],sym:'C = max I(X;Y)',label:'Channel Capacity'},
+{cat:'نظرية المعلومات',words:['bits','بيت','وحدة معلومات'],sym:'bits',label:'bits وحدة المعلومات'},
+{cat:'نظرية المعلومات',words:['nats','ناتس'],sym:'nats',label:'nats (ln)'},
+
+/* ── GRAPH THEORY ──────────────────────────────────────────── */
+{cat:'نظرية الرسم البياني',words:['graph','رسم بياني','جراف'],sym:'G = (V, E)',label:'G=(V,E) الرسم البياني'},
+{cat:'نظرية الرسم البياني',words:['vertices','الرؤوس','عقد'],sym:'V',label:'V الرؤوس'},
+{cat:'نظرية الرسم البياني',words:['edges','الحواف','أضلاع'],sym:'E',label:'E الحواف'},
+{cat:'نظرية الرسم البياني',words:['adjacency matrix','مصفوفة التجاور'],sym:'A_{ij} = 1 if (i,j)∈E',label:'Adjacency Matrix'},
+{cat:'نظرية الرسم البياني',words:['degree','درجة العقدة'],sym:'deg(v)',label:'deg(v) درجة العقدة'},
+{cat:'نظرية الرسم البياني',words:['path','المسار'],sym:'path: v₁→v₂→...→vₙ',label:'Path المسار'},
+{cat:'نظرية الرسم البياني',words:['directed graph','رسم موجه'],sym:'DiGraph G=(V,E)',label:'Directed Graph'},
+{cat:'نظرية الرسم البياني',words:['networkx','نيتوورك إكس'],sym:'import networkx as nx\nG = nx.Graph()',label:'networkx'},
+{cat:'نظرية الرسم البياني',words:['BFS','breadth first search','البحث بالعرض'],sym:'BFS',label:'BFS'},
+{cat:'نظرية الرسم البياني',words:['DFS','depth first search','البحث بالعمق'],sym:'DFS',label:'DFS'},
+{cat:'نظرية الرسم البياني',words:['shortest path','أقصر مسار'],sym:'Dijkstra(G, source)',label:"Dijkstra's Algorithm"},
+{cat:'نظرية الرسم البياني',words:['GNN','graph neural network','شبكة عصبية بيانية'],sym:'GNN',label:'Graph Neural Network'},
+
+/* ── OPTIMIZATION ──────────────────────────────────────────── */
+{cat:'تحسين',words:['objective function','دالة الهدف'],sym:'minimize f(x)',label:'Objective Function'},
+{cat:'تحسين',words:['convex optimization','تحسين محدب'],sym:'min f(x) s.t. g(x)≤0',label:'Convex Optimization'},
+{cat:'تحسين',words:['lagrange multiplier','مضاعفات لاجرانج'],sym:'L(x,λ) = f(x) + λg(x)',label:'Lagrange Multiplier'},
+{cat:'تحسين',words:['KKT conditions','شروط KKT'],sym:'KKT Conditions',label:'KKT Conditions'},
+{cat:'تحسين',words:['newton method','طريقة نيوتن'],sym:"x_{n+1} = xₙ - f(xₙ)/f'(xₙ)",label:'Newton Method'},
+{cat:'تحسين',words:['learning rate decay','تناقص معدل التعلم'],sym:'αₜ = α₀/√t',label:'LR Decay'},
+{cat:'تحسين',words:['momentum','الزخم'],sym:'v := βv - α∇J(θ)',label:'Momentum'},
+{cat:'تحسين',words:['RMSprop','آر إم إس بروب'],sym:'RMSprop',label:'RMSprop'},
+{cat:'تحسين',words:['mini batch','ميني باتش'],sym:'Mini-Batch GD',label:'Mini-Batch GD'},
+{cat:'تحسين',words:['early stopping','إيقاف مبكر'],sym:'EarlyStopping(patience=5)',label:'Early Stopping'},
+
+/* ── REGEX ─────────────────────────────────────────────────── */
+{cat:'Regex',words:['any character','أي حرف regex'],sym:'.',label:'. أي حرف'},
+{cat:'Regex',words:['zero or more','صفر أو أكثر regex'],sym:'*',label:'* صفر أو أكثر'},
+{cat:'Regex',words:['one or more','واحد أو أكثر regex'],sym:'+',label:'+ واحد أو أكثر'},
+{cat:'Regex',words:['zero or one','صفر أو واحد regex'],sym:'?',label:'? اختياري'},
+{cat:'Regex',words:['digit','رقم regex'],sym:'\\d',label:'\\d رقم'},
+{cat:'Regex',words:['non digit','غير رقم regex'],sym:'\\D',label:'\\D غير رقم'},
+{cat:'Regex',words:['word character','حرف كلمة regex'],sym:'\\w',label:'\\w حرف/رقم/_'},
+{cat:'Regex',words:['whitespace','مسافة regex'],sym:'\\s',label:'\\s مسافة'},
+{cat:'Regex',words:['start of string','بداية النص regex'],sym:'^',label:'^ بداية النص'},
+{cat:'Regex',words:['end of string','نهاية النص regex'],sym:'$',label:'$ نهاية النص'},
+{cat:'Regex',words:['group regex','مجموعة regex'],sym:'(pattern)',label:'() مجموعة'},
+{cat:'Regex',words:['character class','فئة حروف regex'],sym:'[a-z]',label:'[] فئة حروف'},
+{cat:'Regex',words:['n times','n مرة regex'],sym:'{n}',label:'{n} n مرة'},
+{cat:'Regex',words:['n to m times','من n إلى m'],sym:'{n,m}',label:'{n,m}'},
+{cat:'Regex',words:['re findall','ريجيكس فايند أول'],sym:"import re\nmatches = re.findall(r'pattern', text)",label:'re.findall()'},
+{cat:'Regex',words:['re search','ريجيكس سيرش'],sym:"match = re.search(r'pattern', text)",label:'re.search()'},
+{cat:'Regex',words:['re sub','ريجيكس استبدال'],sym:"text = re.sub(r'pattern', 'replacement', text)",label:'re.sub()'},
+{cat:'Regex',words:['re compile','ريجيكس كومبايل'],sym:"pattern = re.compile(r'\\d+')",label:'re.compile()'},
+{cat:'Regex',words:['email regex','إيميل ريجيكس'],sym:"r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}'",label:'Email Regex'},
+{cat:'Regex',words:['url regex','يو آر إل ريجيكس'],sym:"r'https?://[^\\s]+'",label:'URL Regex'},
+
+/* ── STATSMODELS ───────────────────────────────────────────── */
+{cat:'Statsmodels',words:['OLS','الانحدار المربعات الصغرى'],sym:'import statsmodels.api as sm\nmodel = sm.OLS(y, sm.add_constant(X)).fit()',label:'OLS'},
+{cat:'Statsmodels',words:['statsmodels summary','ملخص النموذج'],sym:'print(model.summary())',label:'model.summary()'},
+{cat:'Statsmodels',words:['logit statsmodels','لوجت'],sym:'model = sm.Logit(y, X).fit()',label:'sm.Logit()'},
+{cat:'Statsmodels',words:['VIF','تضخم التباين'],sym:'from statsmodels.stats.outliers_influence import variance_inflation_factor\nVIF = variance_inflation_factor(X, i)',label:'VIF'},
+{cat:'Statsmodels',words:['durbin watson','دوربين واتسون'],sym:'from statsmodels.stats.stattools import durbin_watson\ndurbin_watson(residuals)',label:'Durbin-Watson'},
+
+/* ── NLP / TEXT ────────────────────────────────────────────── */
+{cat:'NLP',words:['TF-IDF','تي إف آي دي إف'],sym:'TF-IDF = TF(t,d) × log(N/df(t))',label:'TF-IDF'},
+{cat:'NLP',words:['bag of words','بج أوف وردز'],sym:'BoW',label:'Bag of Words'},
+{cat:'NLP',words:['word2vec','وورد تو فيك'],sym:'Word2Vec',label:'Word2Vec'},
+{cat:'NLP',words:['tokenization','التوكنيزيشن','التحليل اللغوي'],sym:'tokens = text.split()',label:'Tokenization'},
+{cat:'NLP',words:['stemming','الجذور'],sym:'Stemming',label:'Stemming'},
+{cat:'NLP',words:['lemmatization','التلميز'],sym:'Lemmatization',label:'Lemmatization'},
+{cat:'NLP',words:['stop words','كلمات التوقف'],sym:'stop_words',label:'Stop Words'},
+{cat:'NLP',words:['cosine similarity','تشابه الجيب','كوساين'],sym:'cos(θ) = (A·B)/(‖A‖·‖B‖)',label:'Cosine Similarity'},
+{cat:'NLP',words:['BERT','بيرت'],sym:'BERT',label:'BERT'},
+{cat:'NLP',words:['GPT','جي بي تي'],sym:'GPT',label:'GPT'},
+{cat:'NLP',words:['tokenizer','التوكنايزر'],sym:'from transformers import AutoTokenizer\ntokenizer = AutoTokenizer.from_pretrained("model")',label:'AutoTokenizer'},
+{cat:'NLP',words:['perplexity','البيربليكستي','الحيرة'],sym:'PP(W) = P(w₁,w₂,...,wₙ)^(-1/N)',label:'Perplexity'},
+
+/* ── COMPUTER SCIENCE BASICS ────────────────────────────────── */
+{cat:'CS أساسيات',words:['Big O','بيج أو','التعقيد الزمني'],sym:'O(n)',label:'O(n) Big O'},
+{cat:'CS أساسيات',words:['O n squared','أو ن تربيع'],sym:'O(n²)',label:'O(n²)'},
+{cat:'CS أساسيات',words:['O log n','أو لوج ن'],sym:'O(log n)',label:'O(log n)'},
+{cat:'CS أساسيات',words:['O n log n','أو ن لوج ن'],sym:'O(n log n)',label:'O(n log n)'},
+{cat:'CS أساسيات',words:['O 1','أو 1','ثابت'],sym:'O(1)',label:'O(1) ثابت'},
+{cat:'CS أساسيات',words:['recursion','الاستدعاء الذاتي','ريكيرشن'],sym:'def f(n):\n    if n==0: return 1\n    return n * f(n-1)',label:'Recursion'},
+{cat:'CS أساسيات',words:['stack data structure','ستاك هيكل بيانات'],sym:'stack = []\nstack.append(x)  # push\nstack.pop()      # pop',label:'Stack'},
+{cat:'CS أساسيات',words:['queue','طابور','كيو'],sym:'from collections import deque\nq = deque()\nq.append(x)\nq.popleft()',label:'Queue'},
+{cat:'CS أساسيات',words:['binary search','البحث الثنائي'],sym:'bisect.bisect_left(arr, val)',label:'Binary Search'},
+{cat:'CS أساسيات',words:['hash table','هاش تيبل','قاموس هاش'],sym:'d = {} # O(1) lookup',label:'Hash Table'},
+{cat:'CS أساسيات',words:['linked list','قائمة مترابطة'],sym:'LinkedList',label:'Linked List'},
+{cat:'CS أساسيات',words:['binary tree','شجرة ثنائية'],sym:'BinaryTree',label:'Binary Tree'},
+{cat:'CS أساسيات',words:['heap','هيب','كومة'],sym:'import heapq\nheapq.heappush(h, val)',label:'Heap'},
+
+/* ── CLOUD / MLOPS ─────────────────────────────────────────── */
+{cat:'MLOps',words:['docker','دوكر'],sym:'docker build -t image .\ndocker run -p 8080:80 image',label:'Docker'},
+{cat:'MLOps',words:['git commit','جيت كوميت'],sym:'git add .\ngit commit -m "message"\ngit push',label:'Git'},
+{cat:'MLOps',words:['virtual environment','بيئة افتراضية'],sym:'python -m venv venv\nsource venv/bin/activate',label:'venv'},
+{cat:'MLOps',words:['requirements','ريكوايرمنتس','المتطلبات'],sym:'pip freeze > requirements.txt\npip install -r requirements.txt',label:'requirements.txt'},
+{cat:'MLOps',words:['jupyter notebook','جوبيتر','نوتبوك'],sym:'jupyter notebook\n# or\njupyter lab',label:'Jupyter'},
+{cat:'MLOps',words:['mlflow','إم إل فلو'],sym:'import mlflow\nmlflow.log_metric("accuracy", acc)',label:'MLflow'},
+{cat:'MLOps',words:['fastapi','فاست أبي'],sym:'from fastapi import FastAPI\napp = FastAPI()',label:'FastAPI'},
+{cat:'MLOps',words:['streamlit','ستريم ليت'],sym:'import streamlit as st\nst.write("Hello")',label:'Streamlit'},
+{cat:'MLOps',words:['AWS S3','أمازون S3'],sym:'import boto3\ns3 = boto3.client("s3")',label:'AWS S3'},
+{cat:'MLOps',words:['environment variable','متغير البيئة'],sym:'import os\nval = os.environ.get("VAR_NAME")',label:'os.environ'},
+
+/* ── EXTRA MATH SYMBOLS ────────────────────────────────────── */
+{cat:'رموز إضافية',words:['hat notation','هات نوتيشن','تقدير'],sym:'^',label:'^ hat تقدير'},
+{cat:'رموز إضافية',words:['tilde','تيلدا','يوزع على'],sym:'~',label:'~ يوزع على'},
+{cat:'رموز إضافية',words:['distributed as','يتبع توزيع'],sym:'X ~ N(μ,σ²)',label:'X ~ يتبع توزيع'},
+{cat:'رموز إضافية',words:['independent','مستقل إحصائياً'],sym:'X ⊥ Y',label:'X ⊥ Y مستقلان'},
+{cat:'رموز إضافية',words:['converges to','يتقارب إلى'],sym:'→',label:'→ يتقارب إلى'},
+{cat:'رموز إضافية',words:['almost surely','بشكل شبه مؤكد'],sym:'→ a.s.',label:'→ a.s.'},
+{cat:'رموز إضافية',words:['in probability','بالاحتمال'],sym:'→p',label:'→p بالاحتمال'},
+{cat:'رموز إضافية',words:['in distribution','بالتوزيع'],sym:'→d',label:'→d بالتوزيع'},
+{cat:'رموز إضافية',words:['big theta','بيج ثيتا'],sym:'Θ(n)',label:'Θ(n) Big Theta'},
+{cat:'رموز إضافية',words:['big omega','بيج أوميجا'],sym:'Ω(n)',label:'Ω(n) Big Omega'},
+{cat:'رموز إضافية',words:['indicator function','دالة المؤشر'],sym:'𝟙[condition]',label:'𝟙[] دالة المؤشر'},
+{cat:'رموز إضافية',words:['argmax','أرجماكس','أعظم قيمة'],sym:'argmax',label:'argmax'},
+{cat:'رموز إضافية',words:['argmin','أرجمين','أصغر قيمة'],sym:'argmin',label:'argmin'},
+{cat:'رموز إضافية',words:['max operator','ماكس مؤثر'],sym:'max',label:'max'},
+{cat:'رموز إضافية',words:['min operator','مين مؤثر'],sym:'min',label:'min'},
+{cat:'رموز إضافية',words:['sup','سوبريمم'],sym:'sup',label:'sup Supremum'},
+{cat:'رموز إضافية',words:['inf','إنفيمم'],sym:'inf',label:'inf Infimum'},
+{cat:'رموز إضافية',words:['product notation','ضرب متتالي'],sym:'∏ᵢ aᵢ',label:'∏ ضرب متتالي'},
+{cat:'رموز إضافية',words:['summation notation','جمع متتالي','مجموع من i إلى n'],sym:'Σᵢ₌₁ⁿ aᵢ',label:'Σᵢ₌₁ⁿ مجموع'},
+{cat:'رموز إضافية',words:['subscript i','سفلي i'],sym:'xᵢ',label:'xᵢ subscript'},
+{cat:'رموز إضافية',words:['subscript j','سفلي j'],sym:'xⱼ',label:'xⱼ subscript'},
+{cat:'رموز إضافية',words:['superscript t','علوي t'],sym:'xᵗ',label:'xᵗ superscript'},
+{cat:'رموز إضافية',words:['bold x','إكس سميك','متجه x'],sym:'𝐱',label:'𝐱 bold vector'},
+{cat:'رموز إضافية',words:['bold w','دبليو سميك'],sym:'𝐰',label:'𝐰 bold weights'},
+{cat:'رموز إضافية',words:['matrix bold','مصفوفة سميكة'],sym:'𝐗',label:'𝐗 bold matrix'},
+
+];
+
+/* ════════════════════════════════════════════════════════════════
+   BUILD REPLACEMENT MAP
+════════════════════════════════════════════════════════════════ */
+const RMAP=[];
+SYMS.forEach(s=>s.words.forEach(w=>RMAP.push({w:w.toLowerCase(),sym:s.sym})));
+RMAP.sort((a,b)=>b.w.length-a.w.length);
+
+function convertSyms(text){
+  let r=text,cnt=0;
+  RMAP.forEach(({w,sym})=>{
+    const re=new RegExp('(?<![\\w\\u0600-\\u06ff])'+esc(w)+'(?![\\w\\u0600-\\u06ff])','gi');
+    const b=r;r=r.replace(re,sym);if(r!==b)cnt++;
+  });
+  return{text:r,count:cnt};
+}
+function esc(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}
+
+/* ════════════════════════════════════════════════════════════════
+   STATE
+════════════════════════════════════════════════════════════════ */
+const S={cover:'#1e3a5f',paper:'#fdf8f0',ink:'#1a3a6e',bind:'spiral',lines:'ruled',sz:15.5};
+let ro=null,rf='',ti=null,rs=0;
+const PC=1800; // حروف لكل صفحة
+let symCatFilter='الكل';
+
+/* ════════════════════════════════════════════════════════════════
+   OVERLAYS
+════════════════════════════════════════════════════════════════ */
+function openSets(){document.getElementById('sov').classList.add('open')}
+function closeSets(){document.getElementById('sov').classList.remove('open')}
+function openSyms(){buildSymGrid('الكل','');document.getElementById('symsov').classList.add('open')}
+function closeSyms(){document.getElementById('symsov').classList.remove('open')}
+
+function buildSymGrid(cat,search){
+  symCatFilter=cat||symCatFilter;
+  const cats=['الكل',...new Set(SYMS.map(s=>s.cat))];
+  document.getElementById('symCats').innerHTML=cats.map(c=>
+    `<button class="sym-cat${c===symCatFilter?' on':''}" onclick="buildSymGrid('${c}',document.getElementById('sym-search').value)">${c}</button>`
+  ).join('');
+  const q=(search||'').toLowerCase();
+  const items=SYMS.filter(s=>(symCatFilter==='الكل'||s.cat===symCatFilter)&&
+    (!q||s.label.toLowerCase().includes(q)||s.words.some(w=>w.toLowerCase().includes(q))||s.sym.toLowerCase().includes(q)));
+  document.getElementById('symCount').textContent=items.length+' رمز';
+  window._symItems = items;
+  document.getElementById('symGrid').innerHTML=items.map((s,i)=>`
+    <div class="sym-row" onclick="insertSymByIdx(${i})">
+      <div class="sym-s">${s.sym.length>15?s.sym.slice(0,15)+'…':s.sym}</div>
+      <div class="sym-info">
+        <div class="sym-label">${s.label}</div>
+        <div class="sym-words">🗣 ${s.words.slice(0,2).join(' / ')}</div>
+      </div>
+    </div>`).join('');
+}
+
+function filterSyms(){buildSymGrid(symCatFilter,document.getElementById('sym-search').value)}
+
+function insertSymByIdx(i){
+  const s=window._symItems&&window._symItems[i];
+  if(s) insertSym(s.sym);
+}
+function insertSym(sym){
+  const ta=document.getElementById('ta');
+  const pos=ta.selectionStart,v=ta.value;
+  ta.value=v.slice(0,pos)+sym+v.slice(ta.selectionEnd);
+  ta.selectionStart=ta.selectionEnd=pos+sym.length;
+  ta.focus();onIn();
+  showFlash('✅ '+sym.slice(0,30));
+}
+
+/* ════════════════════════════════════════════════════════════════
+   SETTINGS
+════════════════════════════════════════════════════════════════ */
+function pick(k,btn){
+  const g=k==='bind'?'bg':k==='lines'?'lg':'szg';
+  document.querySelectorAll(`#${g} .so`).forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  S[k]=k==='sz'?parseFloat(btn.dataset.v):btn.dataset.v;
+  applyTheme();
+}
+function pickC(d){
+  const t=d.dataset.t;
+  document.querySelectorAll(`.cd[data-t="${t}"]`).forEach(x=>x.classList.remove('on'));
+  d.classList.add('on');S[t]=d.dataset.v;applyTheme();
+}
+
+function lbg(){
+  const c=S.ink;
+  if(S.lines==='ruled') return`repeating-linear-gradient(transparent,transparent 31px,${c}22 31px,${c}22 32px)`;
+  if(S.lines==='grid')  return`repeating-linear-gradient(${c}18 0 1px,transparent 1px 32px),repeating-linear-gradient(90deg,${c}18 0 1px,transparent 1px 32px)`;
+  if(S.lines==='dots')  return`radial-gradient(circle,${c}35 1px,transparent 1px)`;
+  return'none';
+}
+function lsz(){return S.lines==='dots'?'32px 32px':'auto'}
+function lpos(){return S.lines==='dots'?'16px 16px':'0 24px'}
+
+function applyTheme(){
+  const r=document.documentElement;
+  r.style.setProperty('--cover',S.cover);r.style.setProperty('--paper',S.paper);r.style.setProperty('--ink',S.ink);
+  document.getElementById('li').style.background=`linear-gradient(135deg,${S.cover},${S.cover}99)`;
+  const p=document.getElementById('nbp');
+  p.style.background=S.paper;p.style.backgroundImage=lbg();p.style.backgroundSize=lsz();p.style.backgroundPosition=lpos();
+  const ta=document.getElementById('ta');
+  ta.style.color=S.ink;ta.style.fontSize=S.sz+'px';
+  ta.style.backgroundImage=lbg();ta.style.backgroundSize=lsz();ta.style.backgroundPosition=lpos();
+  document.getElementById('nbc').style.background=`linear-gradient(135deg,${S.cover},${S.cover}bb)`;
+  document.getElementById('s2').style.background=S.paper;document.getElementById('s3').style.background=S.paper;
+  buildBind();
+}
+
+function buildBind(){
+  const sp=document.getElementById('sph'),rp=document.getElementById('rph'),ml=document.getElementById('ml');
+  sp.style.display=S.bind==='spiral'?'flex':'none';
+  rp.style.display=S.bind==='rings'?'flex':'none';
+  ml.style.display=S.bind!=='plain'?'block':'none';
+  if(S.bind==='spiral') sp.innerHTML=Array(14).fill(0).map(()=>`<div class="sh" style="border-color:${S.cover}"></div>`).join('');
+  if(S.bind==='rings')  rp.innerHTML=Array(7).fill(0).map(()=>`<div class="rh" style="border-color:${S.cover}"></div>`).join('');
+}
+function startRec(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){showErr('⚠️ التسجيل الصوتي يعمل على Chrome/Edge فقط.');return}
+
+  rf=pages[curPage];
+  if(rf&&!rf.endsWith('\n')) rf+='\n';
+
+  ro=new SR();
+  ro.continuous=true;
+  ro.interimResults=true;
+  ro.lang=document.getElementById('lsel').value;
+  ro.maxAlternatives=1;
+
+  let lastFinalIdx = -1; // منع التكرار — نتابع آخر index معالج
+
+  ro.onresult=e=>{
+    let tmp='';
+
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      const t=e.results[i][0].transcript.trim();
+
+      if(e.results[i].isFinal){
+        // منع التكرار: تجاهل أي نتيجة سبق معالجتها
+        if(i <= lastFinalIdx) continue;
+        lastFinalIdx = i;
+
+        if(!t) continue;
+
+        const{text,count}=convertSyms(t);
+
+        // لو الصفحة امتلأت، انتقل لصفحة جديدة تلقائياً
+        if(rf.length + text.length > PC){
+          pages[curPage] = rf;
+          addPage();
+          rf = '';
+          showFlash('📄 انتقلنا لصفحة جديدة تلقائياً!');
+        }
+
+        rf+=text+' ';
+        pages[curPage]=rf;
+
+        if(count>0) showFlash('✨ تحوّل '+count+' رمز تلقائياً');
+
+      } else {
+        tmp+=t;
+      }
+    }
+
+    document.getElementById('ta').value=rf+tmp;
+    onIn();
+  };
+
+  ro.onerror=e=>{
+    if(e.error==='not-allowed') showErr('⛔ لم يُسمح بالميكروفون — افتحي الإذن');
+    else if(e.error==='network') showErr('⚠️ خطأ في الشبكة');
+    else if(e.error!=='no-speech') showErr('خطأ: '+e.error);
+  };
+
+  ro.onend=()=>{
+    if(ro && ro._on){
+      try{ ro.start(); }catch(ex){}
+    }
+  };
+
+  ro._on=true;
+  ro.start();
+
+  rs=0;
+  ti=setInterval(()=>{
+    rs++;
+    document.getElementById('rtime').textContent=fmt(rs)
+  },1000);
+
+  const sel=document.getElementById('lsel');
+  document.getElementById('rlang').textContent='🔴 '+sel.options[sel.selectedIndex].text;
+
+  document.getElementById('vb').classList.add('on');
+  document.getElementById('rbtn').disabled=true;
+  document.getElementById('rbtn').style.opacity='.4';
+
+  hideErr();
+}
+
+function stopRec(){
+  if(ro){ro._on=false;ro.stop();ro=null}
+  clearInterval(ti);
+
+  pages[curPage]=rf;
+  document.getElementById('ta').value=rf;
+  document.getElementById('vb').classList.remove('on');
+
+  document.getElementById('rbtn').disabled=false;
+  document.getElementById('rbtn').style.opacity='1';
+
+  onIn();
+}
+
+function fmt(s){
+  return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   MULTI-PAGE SYSTEM
+════════════════════════════════════════════════════════════════ */
+let pages = [''];
+let curPage = 0;
+
+function goPage(n){
+  // حفظ الصفحة الحالية
+  pages[curPage] = document.getElementById('ta').value;
+  curPage = n;
+  document.getElementById('ta').value = pages[curPage] || '';
+  rf = pages[curPage] || '';
+  onIn();
+  renderPageNav();
+}
+
+function addPage(){
+  pages.push('');
+  curPage = pages.length - 1;
+  document.getElementById('ta').value = '';
+  rf = '';
+  onIn();
+  renderPageNav();
+}
+
+function renderPageNav(){
+  // تحديث header الصفحة
+  document.getElementById('pgi').textContent = 'الصفحة '+(curPage+1);
+  // تحديث dots الصفحات
+  const pind = document.getElementById('pind');
+  pind.innerHTML = pages.map((_,i)=>`
+    <button onclick="goPage(${i})" style="
+      display:inline-block;margin:0 3px;padding:4px 10px;border-radius:6px;border:1px solid;
+      cursor:pointer;font-size:11px;font-family:'Tajawal',sans-serif;font-weight:600;
+      background:${i===curPage?'rgba(245,200,66,.18)':'transparent'};
+      border-color:${i===curPage?'var(--gold)':'rgba(255,255,255,.15)'};
+      color:${i===curPage?'var(--gold)':'var(--muted)'};
+    ">${i+1}</button>
+  `).join('');
+  // زرار إضافة صفحة
+  pind.innerHTML += `<button onclick="addPage()" style="
+    display:inline-block;margin:0 3px;padding:4px 10px;border-radius:6px;border:1px solid;
+    cursor:pointer;font-size:11px;font-family:'Tajawal',sans-serif;font-weight:600;
+    background:transparent;border-color:rgba(100,200,100,.3);color:#6ee7b7;
+  ">+ صفحة</button>`;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   INPUT HANDLER
+════════════════════════════════════════════════════════════════ */
+function onIn(){
+  const ta = document.getElementById('ta');
+  const v = ta.value;
+  // حفظ في الصفحة الحالية
+  pages[curPage] = v;
+  rf = v;
+
+  // إحصائيات
+  const chars = v.length;
+  const words = v.trim() ? v.trim().split(/\s+/).length : 0;
+  document.getElementById('chi').textContent = chars + ' حرف';
+  document.getElementById('wc').textContent = words + ' كلمة';
+
+  // انتقال تلقائي لصفحة جديدة لو تجاوز الحد (عند الكتابة اليدوية)
+  if(chars > PC){
+    // قص النص عند PC وانقل الزيادة للصفحة الجديدة
+    const cut = v.slice(0, PC);
+    const overflow = v.slice(PC);
+    pages[curPage] = cut;
+    ta.value = cut;
+    rf = cut;
+    addPage();
+    pages[curPage] = overflow;
+    document.getElementById('ta').value = overflow;
+    rf = overflow;
+    showFlash('📄 انتقلنا لصفحة جديدة تلقائياً!');
+    onIn();
+    return;
+  }
+  renderPageNav();
+}
+
+function onScr(){}
+
+/* ════════════════════════════════════════════════════════════════
+   COPY / CLEAR
+════════════════════════════════════════════════════════════════ */
+function copyAll(){
+  // نسخ كل الصفحات مجمعة
+  pages[curPage] = document.getElementById('ta').value;
+  const all = pages.join('\n---\n');
+  navigator.clipboard.writeText(all).then(()=>showFlash('📋 تم نسخ كل الصفحات!'));
+}
+
+function clearAll(){
+  if(!confirm('⚠️ هتمسح كل الصفحات؟')) return;
+  pages = [''];
+  curPage = 0;
+  document.getElementById('ta').value = '';
+  rf = '';
+  onIn();
+}
+
+/* ════════════════════════════════════════════════════════════════
+   UI HELPERS
+════════════════════════════════════════════════════════════════ */
+function showFlash(msg){
+  const f = document.getElementById('flash');
+  f.textContent = msg;
+  f.style.display = 'block';
+  clearTimeout(f._t);
+  f._t = setTimeout(()=>f.style.display='none', 2200);
+}
+
+function showErr(msg){
+  const e = document.getElementById('eb');
+  e.textContent = msg;
+  e.style.display = 'block';
+}
+
+function hideErr(){
+  document.getElementById('eb').style.display = 'none';
+}
+
+applyTheme();
+renderPageNav();
+</script>
+</body>
+</html>
