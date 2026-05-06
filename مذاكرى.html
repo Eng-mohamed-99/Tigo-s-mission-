@@ -1329,38 +1329,44 @@ applyTheme();
 renderPageNav();
 </script>
 </body>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
 <script>
-  const studyConfig = {
+  // الفيشة
+  const config = {
     apiKey: "AIzaSyAx_xs43amXxWr1TChmoQ3i3Ybgv2wozUc",
     databaseURL: "https://daily-tasks-c7681-default-rtdb.firebaseio.com"
   };
 
-  if (!firebase.apps.length) {
-    firebase.initializeApp(studyConfig);
-  }
+  if (!firebase.apps.length) { firebase.initializeApp(config); }
+  const studyDb = firebase.database().ref("shared_note_text");
 
-  const dbRef = firebase.database().ref("shared_study_notes");
-  const textBox = document.getElementById('ta');
+  // استنى ثانية واحدة عشان نضمن إن الصفحة حملت وكل الأكواد القديمة خلصت
+  setTimeout(() => {
+    const box = document.getElementById('ta');
+    
+    if (box) {
+      // 1. أول ما تفتح: هات اللي متسيف
+      studyDb.once('value').then((snap) => {
+        if (snap.exists()) {
+          box.value = snap.val();
+        }
+      });
 
-  if (textBox) {
-    // 1. استقبال الكلام من السيرفر
-    dbRef.on('value', (snapshot) => {
-      const data = snapshot.val();
-      if (data !== null && data !== textBox.value) {
-        textBox.value = data;
-      }
-    });
+      // 2. وأنت بتكتب: ابعت فوراً
+      box.addEventListener('input', (e) => {
+        studyDb.set(e.target.value);
+      });
 
-    // 2. إرسال الكلام للسيرفر وأنت بتكتب
-    textBox.addEventListener('input', () => {
-      dbRef.set(textBox.value);
-    });
-  }
-
-
+      // 3. تحديث تلقائي لو حد تاني (بنت عمك) كتب
+      studyDb.on('value', (snap) => {
+        if (snap.val() !== box.value) {
+          box.value = snap.val() || "";
+        }
+      });
+    }
+  }, 1000); // الثابت الزمني ده هو اللي هيحل المشكلة
 </script>
 
 </html>
