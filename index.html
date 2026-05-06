@@ -1047,6 +1047,8 @@ function rRole(){
         rRoleBtn("م","linear-gradient(135deg,#667eea,#764ba2)","محمد","يضيف المهام ويتابع تيغو 👀",()=>{$.showLogin=true;render();}),
         rRoleBtn($.profile.animal||"🐱","linear-gradient(135deg,#f472b6,#c084fc)","تيغو","الشطورة اللي هتخلص المهام 🌸",()=>setMode("user"))
       ),
+       rRoleBtn("📚","linear-gradient(135deg,#42a5f5,#1e88e5)","المذاكرة","ادخل للمذاكرة",()=> window.location.href="مذاكرى.html"),
+
       el("div",{style:{fontSize:"12px",color:"var(--text2)",textAlign:"center",marginTop:"8px"}},el("span",{cls:"live-dot"})," مزامنة فورية 🔥")
     )
   );
