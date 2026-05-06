@@ -1338,25 +1338,31 @@ renderPageNav();
     databaseURL: "https://daily-tasks-c7681-default-rtdb.firebaseio.com"
   };
   if (!firebase.apps.length) { firebase.initializeApp(conf); }
-  const studyDb = firebase.database().ref("final_study_note");
+  const db = firebase.database();
 
-  // دي "الخبطة" اللي هتصلح كل حاجة
   setInterval(() => {
-    const box = document.querySelector('textarea');
-    if (box && !box.dataset.linked) {
-      box.dataset.linked = "true"; // عشان نربطه مرة واحدة بس
+    const box = document.getElementById('ta');
+    // بنعرف رقم الصفحة من نص العنوان اللي فوق المربع عندك
+    const page Title = document.querySelector('h2') ? document.querySelector('h2').innerText : "page1";
+    const pageId = pageTitle.replace(/\s+/g, '_'); // بيحول "صفحة 1" لـ "صفحة_1"
 
-      // اسحب اللي في القاعدة وحطه في المربع
-      studyDb.once('value', (s) => { if(s.exists()) box.value = s.val(); });
+    if (box) {
+      // لو غيرت الصفحة، اسحب داتا الصفحة الجديدة
+      if (box.dataset.lastPage !== pageId) {
+        box.dataset.lastPage = pageId;
+        db.ref("study_pages/" + pageId).once('value', (s) => {
+          box.value = s.val() || "";
+        });
+      }
 
-      // أي حرف يتكتب يترمي في القاعدة فوراً
-      box.oninput = () => { studyDb.set(box.value); };
-      
-      // تحديث لو حد تاني كتب
-      studyDb.on('value', (s) => { if(s.val() !== box.value) box.value = s.val() || ""; });
+      // حفظ الكلام في الصفحة الصح وأنت بتكتب
+      box.oninput = () => {
+        db.ref("study_pages/" + pageId).set(box.value);
+      };
     }
-  }, 500); // بيفحص المربع كل نص ثانية عشان لو الكود القديم مسحه، ده يرجعه
+  }, 500);
 </script>
+
 
 
 </html>
