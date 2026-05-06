@@ -1325,10 +1325,11 @@ function hideErr(){
   document.getElementById('eb').style.display = 'none';
 }
 
-applyTheme();
+  applyTheme();
 renderPageNav();
 </script>
 </body>
+
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
@@ -1337,29 +1338,32 @@ renderPageNav();
     apiKey: "AIzaSyAx_xs43amXxWr1TChmoQ3i3Ybgv2wozUc",
     databaseURL: "https://daily-tasks-c7681-default-rtdb.firebaseio.com"
   };
-  if (!firebase.apps.length) { firebase.initializeApp(studyConf); }
+
+  if (!firebase.apps.length) {
+    firebase.initializeApp(studyConf);
+  }
+
   const studyDb = firebase.database().ref("global_study_note");
 
-  // الكود ده شغال "بلطجة" بيجبر المربع يكتب ويسيف
-  setInterval(() => {
-    const box = document.getElementById('ta') || document.querySelector('textarea');
-    if (box) {
-      // لو المربع فاضي والسيرفر فيه داتا.. حط الداتا
-      if (box.value === "") {
-        studyDb.once('value', (s) => {
-          if (s.exists() && box.value === "") { box.value = s.val(); }
-        });
+  const box = document.getElementById('ta') || document.querySelector('textarea');
+
+  if (box) {
+
+    // تحميل البيانات أول ما الصفحة تفتح + تحديث مباشر
+    studyDb.on('value', (snap) => {
+      if (snap.exists()) {
+        box.value = snap.val();
+      } else {
+        box.value = "";
       }
-      
-      // أي حرف يتكتب يتسيف فوراً
-      box.oninput = () => {
-        studyDb.set(box.value);
-      };
-    }
-  }, 1000); // بيكشف على المربع كل ثانية
+    });
+
+    // حفظ تلقائي عند الكتابة
+    box.addEventListener('input', () => {
+      studyDb.set(box.value);
+    });
+
+  }
 </script>
-
-
-
 
 </html>
