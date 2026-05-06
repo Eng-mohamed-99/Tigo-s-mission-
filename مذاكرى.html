@@ -1329,4 +1329,34 @@ applyTheme();
 renderPageNav();
 </script>
 </body>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+<script>
+  const config = {
+    apiKey: "AIzaSyAx_xs43amXxWr1TChmoQ3i3Ybgv2wozUc",
+    databaseURL: "https://daily-tasks-c7681-default-rtdb.firebaseio.com"
+  };
+
+  if (!firebase.apps.length) {
+    firebase.initializeApp(config);
+  }
+  const studyDb = firebase.database().ref("study_shared_data");
+
+  // التعديل هنا: لقطنا المربع بالـ ID بتاعه اللي في كودك 'ta'
+  const box = document.getElementById('ta');
+
+  if (box) {
+    studyDb.on('value', (snapshot) => {
+      if (snapshot.exists()) {
+        box.value = snapshot.val();
+      }
+    });
+
+    box.addEventListener('input', (e) => {
+      studyDb.set(e.target.value);
+    });
+  }
+</script>
+
 </html>
