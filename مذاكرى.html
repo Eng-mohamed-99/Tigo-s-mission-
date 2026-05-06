@@ -1333,30 +1333,34 @@ renderPageNav();
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
 <script>
-  const config = {
+  const studyConfig = {
     apiKey: "AIzaSyAx_xs43amXxWr1TChmoQ3i3Ybgv2wozUc",
     databaseURL: "https://daily-tasks-c7681-default-rtdb.firebaseio.com"
   };
 
   if (!firebase.apps.length) {
-    firebase.initializeApp(config);
+    firebase.initializeApp(studyConfig);
   }
-  const studyDb = firebase.database().ref("study_shared_data");
 
-  // التعديل هنا: لقطنا المربع بالـ ID بتاعه اللي في كودك 'ta'
-  const box = document.getElementById('ta');
+  const dbRef = firebase.database().ref("shared_study_notes");
+  const textBox = document.getElementById('ta');
 
-  if (box) {
-    studyDb.on('value', (snapshot) => {
-      if (snapshot.exists()) {
-        box.value = snapshot.val();
+  if (textBox) {
+    // 1. استقبال الكلام من السيرفر
+    dbRef.on('value', (snapshot) => {
+      const data = snapshot.val();
+      if (data !== null && data !== textBox.value) {
+        textBox.value = data;
       }
     });
 
-    box.addEventListener('input', (e) => {
-      studyDb.set(e.target.value);
+    // 2. إرسال الكلام للسيرفر وأنت بتكتب
+    textBox.addEventListener('input', () => {
+      dbRef.set(textBox.value);
     });
   }
+
+
 </script>
 
 </html>
